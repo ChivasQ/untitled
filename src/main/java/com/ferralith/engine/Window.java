@@ -1,5 +1,10 @@
 package com.ferralith.engine;
 
+import com.ferralith.engine.inputs.KeyListener;
+import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.scenes.LevelScene;
+import com.ferralith.engine.scenes.TestScene;
+import com.ferralith.engine.utils.Time;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -7,7 +12,6 @@ import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.nio.IntBuffer;
-import java.security.Key;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -18,13 +22,35 @@ public class Window {
     private int width, height;
     private String title;
     private long glfwWindow;
+    public float r, b, g;
 
     private static Window window = null;
+
+    private static Scene currnetScene = null;
 
     public Window(){
         this.height =  100;
         this.width =  100;
         this.title =  "title";
+        this.r = 0.0f;
+        this.g = 0.0f;
+        this.b = 0.0f;
+    }
+
+    public static void changeScene(int newScene) {
+        switch (newScene) {
+            case 0:
+                currnetScene = new LevelScene();
+                //currentScene.init();
+                break;
+            case 1:
+                currnetScene = new TestScene();
+                //currentScene.init();
+                break;
+            default:
+                assert false : ("Unknown scene: " + newScene);
+                break;
+        }
     }
 
     public static Window get() {
@@ -109,25 +135,36 @@ public class Window {
 
         // Make the window visible
         glfwShowWindow(glfwWindow);
+
+        GL.createCapabilities();
+
+        Window.changeScene(0);
     }
 
     public void loop() {
-        GL.createCapabilities();
+        float beginTime = Time.getTime();
+        float endTime;
+        float dt = -1.0f;
 
         while(!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClearColor(r, g, b, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
             if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
                 glfwSetWindowShouldClose(glfwWindow, true);
             }
-            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
-                System.out.println("key test");
+
+            if (dt >= 0) {
+                currnetScene.update(dt);
             }
 
             glfwSwapBuffers(glfwWindow);
+
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.ferralith.engine;
+package com.ferralith.engine.inputs;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
