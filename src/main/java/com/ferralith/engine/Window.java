@@ -26,7 +26,7 @@ public class Window {
 
     private static Window window = null;
 
-    private static Scene currnetScene = null;
+    private static Scene currentScene = null;
 
     public Window(){
         this.height =  100;
@@ -40,12 +40,12 @@ public class Window {
     public static void changeScene(int newScene) {
         switch (newScene) {
             case 0:
-                currnetScene = new LevelScene();
-                //currentScene.init();
+                currentScene = new LevelScene();
+                currentScene.init();
                 break;
             case 1:
-                currnetScene = new TestScene();
-                //currentScene.init();
+                currentScene = new TestScene();
+                currentScene.init();
                 break;
             default:
                 assert false : ("Unknown scene: " + newScene);
@@ -157,7 +157,7 @@ public class Window {
             }
 
             if (dt >= 0) {
-                currnetScene.update(dt);
+                currentScene.update(dt);
             }
 
             glfwSwapBuffers(glfwWindow);

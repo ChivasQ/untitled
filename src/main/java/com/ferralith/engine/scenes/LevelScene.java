@@ -14,16 +14,9 @@ public class LevelScene extends Scene {
 
     @Override
     public void update(float dt) {
-        if (KeyListener.isKeyPressed(KeyEvent.VK_SPACE))
-        {
-            Window.get().r = 1.0f;
-            Window.get().g = 1.0f;
-            Window.get().b = 0.0f;
-        } else {
-            Window.get().r = 0.0f;
-            Window.get().g = 0.0f;
-            Window.get().b = 0.0f;
-        }
+
+
+
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_2)) {
             Window.changeScene(1);
