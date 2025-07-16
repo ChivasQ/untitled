@@ -1,9 +1,11 @@
 package com.ferralith.engine.scenes;
 
+import com.ferralith.engine.Camera;
 import com.ferralith.engine.Scene;
 import com.ferralith.engine.Window;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.renderer.Shader;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.awt.event.KeyEvent;
@@ -42,11 +44,12 @@ public class TestScene extends Scene {
 
     //        x     y     z       r     g     b     a
     private float[] vertexArray = {
-            0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, 1.0f,  // 0: Bottom right
-            -0.5f,  0.5f, 0.0f,   0.0f, 1.0f, 0.0f, 1.0f,  // 1: Top left
-            0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f,  // 2: Top right
-            -0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 0.0f, 1.0f   // 3: Bottom left
+            0.5f * 100, -0.5f * 100, 0.0f * 100,   1.0f, 0.0f, 0.0f, 1.0f,  // 0: Bottom right
+            -0.5f * 100,  0.5f * 100, 0.0f * 100,   0.0f, 1.0f, 0.0f, 1.0f,  // 1: Top left
+            0.5f * 100,  0.5f * 100, 0.0f * 100,   0.0f, 0.0f, 1.0f, 1.0f,  // 2: Top right
+            -0.5f * 100, -0.5f * 100, 0.0f * 100,   1.0f, 1.0f, 0.0f, 1.0f   // 3: Bottom left
     };
+
 
     private int[] elementArray = {
             2, 1, 0,  // Top right triangle
@@ -63,10 +66,13 @@ public class TestScene extends Scene {
 
     @Override
     public void init() {
+        this.camera = new Camera(new Vector2f());
         testShader = new Shader("assets/shaders/default.fsh", "assets/shaders/default.vsh");
         testShader.compile();
 
-
+//        for (int i = 0; i < vertexArray.length; i++) {
+//            vertexArray[i] *= 200;
+//        }
 
         vaoID = glGenVertexArrays();
         glBindVertexArray(vaoID);
@@ -104,8 +110,10 @@ public class TestScene extends Scene {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-
+        camera.position.x -= dt * 25.0f;
         testShader.use();
+        testShader.uploadmat4f("uProjection", camera.getProjectionMatrix());
+        testShader.uploadmat4f("uView", camera.getViewMatrix());
 
         glBindVertexArray(vaoID);
 
