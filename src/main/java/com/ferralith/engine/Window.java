@@ -32,9 +32,9 @@ public class Window {
         this.height =  100;
         this.width =  100;
         this.title =  "title";
-        this.r = 0.0f;
-        this.g = 0.0f;
-        this.b = 0.0f;
+        this.r = 0.1f;
+        this.g = 0.2f;
+        this.b = 0.1f;
     }
 
     public static void changeScene(int newScene) {
@@ -138,7 +138,7 @@ public class Window {
 
         GL.createCapabilities();
 
-        Window.changeScene(0);
+        Window.changeScene(1);
     }
 
     public void loop() {

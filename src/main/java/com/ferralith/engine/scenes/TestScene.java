@@ -5,6 +5,8 @@ import com.ferralith.engine.Scene;
 import com.ferralith.engine.Window;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.renderer.Shader;
+import com.ferralith.engine.renderer.Texture;
+import com.ferralith.engine.utils.Time;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
@@ -42,12 +44,12 @@ public class TestScene extends Scene {
 
     private int vertexID, fragmentID, shaderProgram;
 
-    //        x     y     z       r     g     b     a
+    //        x     y     z       r     g     b     a                               UV
     private float[] vertexArray = {
-            0.5f * 100, -0.5f * 100, 0.0f * 100,   1.0f, 0.0f, 0.0f, 1.0f,  // 0: Bottom right
-            -0.5f * 100,  0.5f * 100, 0.0f * 100,   0.0f, 1.0f, 0.0f, 1.0f,  // 1: Top left
-            0.5f * 100,  0.5f * 100, 0.0f * 100,   0.0f, 0.0f, 1.0f, 1.0f,  // 2: Top right
-            -0.5f * 100, -0.5f * 100, 0.0f * 100,   1.0f, 1.0f, 0.0f, 1.0f   // 3: Bottom left
+            0.5f * 500, -0f * 500, 0.0f * 500,      1.0f, 0.0f, 0.0f, 1.0f,     1, 0,  // 0: Bottom right
+            -0.5f * 500,  0.5f * 500, 0.0f * 500,   0.0f, 1.0f, 0.0f, 1.0f,     0, 1,  // 1: Top left
+            0.5f * 500,  0.5f * 500, 0.0f * 500,    0.0f, 0.0f, 1.0f, 1.0f,     1, 1,  // 2: Top right
+            -0.5f * 500, 0f * 500, 0.0f * 500,      1.0f, 1.0f, 0.0f, 1.0f,     0, 0,  // 3: Bottom left
     };
 
 
@@ -59,16 +61,21 @@ public class TestScene extends Scene {
     private int vaoID, vboID, eboID;
 
     private Shader testShader;
-
+    private Texture testTexture;
+    private boolean initialized = false;
     public TestScene() {
         System.out.println("TEST SCENE");
     }
 
     @Override
     public void init() {
+        if (initialized) return;
+        initialized = true;
         this.camera = new Camera(new Vector2f());
         testShader = new Shader("assets/shaders/default.fsh", "assets/shaders/default.vsh");
         testShader.compile();
+
+        this.testTexture = new Texture("D:\\untitled\\src\\main\\java\\com\\ferralith\\testImage.png");
 
 //        for (int i = 0; i < vertexArray.length; i++) {
 //            vertexArray[i] *= 200;
@@ -93,8 +100,9 @@ public class TestScene extends Scene {
 
         int positionSize = 3;
         int colorSize = 4;
-        int floatSizeBytes = 4;
-        int vertexSizeBytes = (positionSize + colorSize) * floatSizeBytes;
+        int uvSize = 2;
+        int floatSizeBytes = Float.BYTES;
+        int vertexSizeBytes = (positionSize + colorSize + uvSize) * floatSizeBytes;
 
         glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
         glEnableVertexAttribArray(0);
@@ -102,6 +110,8 @@ public class TestScene extends Scene {
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
         glEnableVertexAttribArray(1);
 
+        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionSize + colorSize) * floatSizeBytes);
+        glEnableVertexAttribArray(2);
 
     }
 
@@ -110,10 +120,18 @@ public class TestScene extends Scene {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-        camera.position.x -= dt * 25.0f;
+        camera.position.x = -750.0f;
+        camera.position.y = -400.0f;
+
         testShader.use();
-        testShader.uploadmat4f("uProjection", camera.getProjectionMatrix());
-        testShader.uploadmat4f("uView", camera.getViewMatrix());
+
+        testShader.uploadTexture("TEX_SAMPLER", 0);
+        glActiveTexture(GL_TEXTURE0);
+        testTexture.bind();
+
+        testShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
+        testShader.uploadMat4f("uView", camera.getViewMatrix());
+        testShader.uploadFloat("uTime", Time.getTime());
 
         glBindVertexArray(vaoID);
 
