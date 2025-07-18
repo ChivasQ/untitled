@@ -1,71 +1,15 @@
 package com.ferralith.engine.scenes;
 
-import com.ferralith.engine.Camera;
-import com.ferralith.engine.GameObject;
-import com.ferralith.engine.Scene;
-import com.ferralith.engine.Window;
+import com.ferralith.engine.*;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.inputs.KeyListener;
-import com.ferralith.engine.renderer.Shader;
-import com.ferralith.engine.renderer.Texture;
-import com.ferralith.engine.utils.Time;
 import org.joml.Vector2f;
-import org.lwjgl.BufferUtils;
+import org.joml.Vector4f;
 
 import java.awt.event.KeyEvent;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class TestScene extends Scene {
-
-    private String vertexShaderSrc = "#version 330 core\n" +
-            "\n" +
-            "layout (location = 0) in vec3 aPos;\n" +
-            "layout (location = 1) in vec4 aColor;\n" +
-            "\n" +
-            "out vec4 fColor;\n" +
-            "\n" +
-            "void main() {\n" +
-            "    fColor = aColor;\n" +
-            "    gl_Position = vec4(aPos, 1.0);\n" +
-            "}";
-
-    private String fragmentShaderSrc = "#version 330 core\n" +
-            "\n" +
-            "in vec4 fColor;\n" +
-            "\n" +
-            "out vec4 color;\n" +
-            "\n" +
-            "void main() {\n" +
-            "     color = fColor;\n" +
-            "}";
-
-    private int vertexID, fragmentID, shaderProgram;
-
-    //        x     y     z       r     g     b     a                               UV
-    private float[] vertexArray = {
-            0.5f * 500, -0f * 500, 0.0f * 500,      1.0f, 0.0f, 0.0f, 1.0f,     1, 0,  // 0: Bottom right
-            -0.5f * 500,  0.5f * 500, 0.0f * 500,   0.0f, 1.0f, 0.0f, 1.0f,     0, 1,  // 1: Top left
-            0.5f * 500,  0.5f * 500, 0.0f * 500,    0.0f, 0.0f, 1.0f, 1.0f,     1, 1,  // 2: Top right
-            -0.5f * 500, 0f * 500, 0.0f * 500,      1.0f, 1.0f, 0.0f, 1.0f,     0, 0,  // 3: Bottom left
-    };
-
-
-    private int[] elementArray = {
-            2, 1, 0,  // Top right triangle
-            0, 1, 3   // Bottom left triangle
-    };
-
-    private int vaoID, vboID, eboID;
-
-    private Shader testShader;
-    private Texture testTexture;
     private boolean initialized = false;
-    private GameObject testObj;
 
     public TestScene() {
         System.out.println("TEST SCENE");
@@ -75,55 +19,24 @@ public class TestScene extends Scene {
     public void init() {
         if (initialized) return;
         initialized = true;
-        System.out.println("creating test object");
-        this.testObj = new GameObject("test obj");
-        this.testObj.addComponent(new SpriteRenderer());
-        this.addGameObject(this.testObj);
+        this.camera = new Camera(new Vector2f(-500,-59));
 
+        int xOffset = 10;
+        int yOffset = 10;
+        float totalWidth = (float)(600 - xOffset * 2);
+        float totalHeight = (float)(600 - yOffset * 2);
+        float sizeX = totalWidth / 100.0f;
+        float sizeY = totalHeight / 100.0f;
 
-
-        this.camera = new Camera(new Vector2f());
-        testShader = new Shader("assets/shaders/default.fsh", "assets/shaders/default.vsh");
-        testShader.compile();
-
-        this.testTexture = new Texture("D:\\untitled\\src\\main\\java\\com\\ferralith\\testImage.png");
-
-//        for (int i = 0; i < vertexArray.length; i++) {
-//            vertexArray[i] *= 200;
-//        }
-
-        vaoID = glGenVertexArrays();
-        glBindVertexArray(vaoID);
-
-        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexArray.length);
-        vertexBuffer.put(vertexArray).flip();
-
-        vboID = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-
-        IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.length);
-        elementBuffer.put(elementArray).flip();
-
-        eboID = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
-
-        int positionSize = 3;
-        int colorSize = 4;
-        int uvSize = 2;
-        int floatSizeBytes = Float.BYTES;
-        int vertexSizeBytes = (positionSize + colorSize + uvSize) * floatSizeBytes;
-
-        glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
-        glEnableVertexAttribArray(1);
-
-        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionSize + colorSize) * floatSizeBytes);
-        glEnableVertexAttribArray(2);
-
+        for (int x = 0; x < 100; x++) {
+            for (int y = 0; y < 100; y++) {
+                float xPos = xOffset + (x * sizeX);
+                float yPos = yOffset + (y * sizeY);
+                GameObject go = new GameObject("Obj" + x + " " + y, new Transform(new Vector2f(xPos, yPos), new Vector2f(sizeX, sizeY)));
+                go.addComponent(new SpriteRenderer(new Vector4f(xPos / totalWidth, yPos / totalHeight, 1, 1)));
+                this.addGameObject(go);
+            }
+        }
     }
 
     @Override
@@ -131,34 +44,14 @@ public class TestScene extends Scene {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-        camera.position.x = -750.0f;
-        camera.position.y = -400.0f;
 
-        testShader.use();
 
-        testShader.uploadTexture("TEX_SAMPLER", 0);
-        glActiveTexture(GL_TEXTURE0);
-        testTexture.bind();
 
-        testShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
-        testShader.uploadMat4f("uView", camera.getViewMatrix());
-        testShader.uploadFloat("uTime", Time.getTime());
-
-        glBindVertexArray(vaoID);
-
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-
-        glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
-
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-
-        glBindVertexArray(0);
-        testShader.detach();
 
         for (GameObject go : this.gameObjects) {
             go.update(dt);
         }
+
+        this.renderer.render();
     }
 }

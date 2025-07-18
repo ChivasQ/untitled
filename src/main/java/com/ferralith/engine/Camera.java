@@ -38,5 +38,4 @@ public class Camera {
     public Matrix4f getProjectionMatrix() {
         return this.projectionMatrix;
     }
-
 }

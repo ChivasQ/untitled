@@ -62,6 +62,10 @@ public class Window {
         return Window.window;
     }
 
+    public static Scene getScene() {
+        return get().currentScene;
+    }
+
     public Window setSize(int width, int height) {
         this.height = height;
         this.width = width;
