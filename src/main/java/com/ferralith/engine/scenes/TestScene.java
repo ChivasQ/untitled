@@ -1,8 +1,10 @@
 package com.ferralith.engine.scenes;
 
 import com.ferralith.engine.Camera;
+import com.ferralith.engine.GameObject;
 import com.ferralith.engine.Scene;
 import com.ferralith.engine.Window;
+import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.renderer.Shader;
 import com.ferralith.engine.renderer.Texture;
@@ -63,6 +65,8 @@ public class TestScene extends Scene {
     private Shader testShader;
     private Texture testTexture;
     private boolean initialized = false;
+    private GameObject testObj;
+
     public TestScene() {
         System.out.println("TEST SCENE");
     }
@@ -71,6 +75,13 @@ public class TestScene extends Scene {
     public void init() {
         if (initialized) return;
         initialized = true;
+        System.out.println("creating test object");
+        this.testObj = new GameObject("test obj");
+        this.testObj.addComponent(new SpriteRenderer());
+        this.addGameObject(this.testObj);
+
+
+
         this.camera = new Camera(new Vector2f());
         testShader = new Shader("assets/shaders/default.fsh", "assets/shaders/default.vsh");
         testShader.compile();
@@ -145,5 +156,9 @@ public class TestScene extends Scene {
 
         glBindVertexArray(0);
         testShader.detach();
+
+        for (GameObject go : this.gameObjects) {
+            go.update(dt);
+        }
     }
 }
