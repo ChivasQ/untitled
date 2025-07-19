@@ -2,6 +2,7 @@ package com.ferralith.engine.renderer;
 
 import com.ferralith.engine.Window;
 import com.ferralith.engine.components.SpriteRenderer;
+import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.Time;
 import org.joml.Vector4f;
 
@@ -41,7 +42,7 @@ public class RenderBatch {
     private Shader shader;
 
     public RenderBatch(int maxBatchSize) {
-        shader = new Shader("assets/shaders/default.fsh", "assets/shaders/default.vsh");
+        shader = AssetPool.getShader("default");
         shader.compile();
         this.sprites = new SpriteRenderer[maxBatchSize];
         this.maxBatchSize = maxBatchSize;

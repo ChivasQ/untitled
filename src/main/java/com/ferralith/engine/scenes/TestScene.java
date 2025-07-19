@@ -3,6 +3,7 @@ package com.ferralith.engine.scenes;
 import com.ferralith.engine.*;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.inputs.KeyListener;
+import com.ferralith.engine.utils.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -37,6 +38,12 @@ public class TestScene extends Scene {
                 this.addGameObject(go);
             }
         }
+
+        loadResources();
+    }
+
+    private void loadResources() {
+        AssetPool.getShader("default");
     }
 
     @Override
