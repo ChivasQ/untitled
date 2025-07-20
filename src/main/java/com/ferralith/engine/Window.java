@@ -8,7 +8,11 @@ import com.ferralith.engine.utils.Time;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.MemoryStack;
+
+import static java.lang.Character.getType;
+import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.nio.IntBuffer;
@@ -95,6 +99,17 @@ public class Window {
     public void init() {
         GLFWErrorCallback.createPrint(System.err).set();
 
+        // Функция обратного вызова
+        GLDebugMessageCallback debugCallback = GLDebugMessageCallback.create((source, type, id, severity, length, message, userParam) -> {
+            String msg = GLDebugMessageCallback.getMessage(length, message);
+            System.err.println("OpenGL DEBUG MESSAGE:");
+            System.err.println("Source: " + source);
+            System.err.println("Type: " + getType(type));
+            System.err.println("Severity: " + severity);
+            System.err.println("Message: " + msg);
+        });
+
+
         if ( !glfwInit() )
             throw new IllegalStateException("Unable to initialize GLFW");
 
@@ -143,7 +158,10 @@ public class Window {
         glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
-
+// Устанавливаем callback
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // чтобы сообщения приходили немедленно
+        glDebugMessageCallback(debugCallback, 0);
         Window.changeScene(1);
     }
 

@@ -10,12 +10,17 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_DEBUG_CONTEXT;
+import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_ERROR;
+import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class RenderBatch {
+    // TODO: some bugs with batch, redo
     // Vertex
     // ======
     // Pos              Color                           Tex Coords          Tex Id
@@ -65,7 +70,7 @@ public class RenderBatch {
         vboID = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
 
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
         // Create and upload indices buff
         int eboID = glGenBuffers();
@@ -115,15 +120,11 @@ public class RenderBatch {
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glEnableVertexAttribArray(3);
 
         glDrawElements(GL_TRIANGLES, this.numSprites * 6, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
-        glDisableVertexAttribArray(3);
 
         glBindVertexArray(0);
 
@@ -143,9 +144,6 @@ public class RenderBatch {
             if(!textures.contains(renderer.getTexture())) {
                 textures.add(renderer.getTexture());
             }
-        }
-        if (textures.size() >= 8) {
-            this.hasRoom = false;
         }
 
         loadVertexProperties(index);
@@ -186,7 +184,7 @@ public class RenderBatch {
                 yAdd = 1.0f;
             }
             // Load position
-            vertices[offset] = spr.gameObject.transform.position.x + (xAdd * spr.gameObject.transform.scale.x);
+            vertices[offset + 0] = spr.gameObject.transform.position.x + (xAdd * spr.gameObject.transform.scale.x);
             vertices[offset + 1] = spr.gameObject.transform.position.y + (yAdd * spr.gameObject.transform.scale.y);
 
             // Load color
@@ -200,10 +198,12 @@ public class RenderBatch {
             vertices[offset + 7] = texCoords[i].y;
 
             // Load texture id
+            System.out.println(texID);
             vertices[offset + 8] = texID;
 
             offset += VERTEX_SIZE;
         }
+        System.out.println("Textures in batch: " + textures.size());
     }
 
     private void loadElementIndices(int[] elements, int i) {
@@ -225,5 +225,13 @@ public class RenderBatch {
 
     public boolean hasRoom() {
         return this.hasRoom;
+    }
+
+    public boolean hasTextureRoom() {
+        return textures.size() < 8;
+    }
+
+    public boolean hasTexture(Texture texture) {
+        return textures.contains(texture);
     }
 }

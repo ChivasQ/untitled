@@ -2,14 +2,17 @@
 
 in vec4 fColor;
 in vec2 fTexCoords;
-in float fTexId;
+flat in int fTexId;
 
-uniform sampler2D uTextures[8];
+uniform sampler2D uTextures[3];
 
 out vec4 color;
 
+float normalize1(float x, float minVal, float maxVal) {
+    return clamp((x - minVal) / (maxVal - minVal), 0.0, 1.0);
+}
+
 void main() {
-    int id = int(fTexId);
-    //color = vec4(fTexCoords, 0.0, 1.0);
-    color = fColor * texture(uTextures[id], fTexCoords);
+    //color = vec4(normalize1(fTexId, 0, 8), 0.0, 0, 1.0);
+    color = texture(uTextures[fTexId], fTexCoords);
 }

@@ -1,5 +1,6 @@
 package com.ferralith.engine.utils;
 
+import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.renderer.Shader;
 import com.ferralith.engine.renderer.Texture;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 public class AssetPool {
     public static Map<String, Shader> shaders = new HashMap<>();
     private static Map<String, Texture> textures = new HashMap<>();
+    private static Map<String, SpriteSheet> spritesheets = new HashMap<>();
 
     public static Shader getShader(String resourceName) {
         File file = new File(Paths.SHADER_PATH + resourceName);
@@ -34,6 +36,21 @@ public class AssetPool {
             AssetPool.textures.put(file.getAbsolutePath(), texture);
             return texture;
         }
+    }
+
+    public static void addSpriteSheet(String resourceName, SpriteSheet spriteSheet) {
+        File file = new File(Paths.TEXTURE_PATH + resourceName);
+        if (!AssetPool.spritesheets.containsKey(file.getAbsolutePath())) {
+            AssetPool.spritesheets.put(file.getAbsolutePath(), spriteSheet);
+        }
+    }
+
+    public static SpriteSheet getSpritesheet(String resourceName) {
+        File file = new File(Paths.TEXTURE_PATH + resourceName);
+        if (!AssetPool.spritesheets.containsKey(file.getAbsolutePath())) {
+            assert false : "Error: tried to access spritesheet '" + file.getAbsolutePath() + "' and it has not been added to asset pool";
+        }
+        return AssetPool.spritesheets.getOrDefault(file.getAbsolutePath(), null);
     }
 
 }

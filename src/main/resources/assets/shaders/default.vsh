@@ -10,12 +10,12 @@ uniform mat4 uView;
 
 out vec4 fColor;
 out vec2 fTexCoords;
-out float fTexId;
+out int  fTexId;
 
 void main() {
     fColor = aColor;
     fTexCoords = aTexCoords;
-    fTexId = aTexId;
+    fTexId = int(aTexId);
 
     gl_Position = uProjection * uView * vec4(aPos, 1.0);
 }
