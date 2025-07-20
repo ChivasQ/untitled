@@ -104,8 +104,19 @@ public class RenderBatch {
     public void render() {
         // TODO: do not rebuffer all data every frame
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+        boolean rebufferData = false;
+        for (int i = 0; i < numSprites; i++) {
+            SpriteRenderer spriteRenderer = sprites[i];
+            if (spriteRenderer.isDirty()) {
+                loadVertexProperties(i);
+                spriteRenderer.setDirty(false);
+                rebufferData = true;
+            }
+        }
+        if (rebufferData) {
+            glBindBuffer(GL_ARRAY_BUFFER, vboID);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+        }
 
         shader.use();
         shader.uploadMat4f("uProjection", Window.getScene().getCamera().getProjectionMatrix());
@@ -164,7 +175,7 @@ public class RenderBatch {
         int texID = 0;
         if (spr.getTexture() != null) {
             for (int i = 0; i < textures.size(); i++) {
-                if (textures.get(i) == spr.getTexture()) {
+                if (textures.get(i).equals(spr.getTexture())) {
                     texID = i;
                     break;
                 }

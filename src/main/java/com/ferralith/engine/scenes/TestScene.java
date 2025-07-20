@@ -12,7 +12,8 @@ import java.awt.event.KeyEvent;
 
 public class TestScene extends Scene {
     private boolean initialized = false;
-
+    private GameObject object1;
+    private SpriteSheet spriteSheet;
     public TestScene() {
         System.out.println("TEST SCENE");
     }
@@ -24,7 +25,8 @@ public class TestScene extends Scene {
 
         loadResources();
 
-        SpriteSheet spriteSheet = AssetPool.getSpritesheet("spritesheets/spritesheet.png");
+
+        spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
 
         this.camera = new Camera(new Vector2f(-250,0));
 
@@ -43,21 +45,39 @@ public class TestScene extends Scene {
         GameObject obj4 = new GameObject("obj4", new Transform(new Vector2f(600, 500), new Vector2f(256, 256)));
         obj4.addComponent(new SpriteRenderer(spriteSheet.getSprite(0)));
         addGameObject(obj4);
+
+        object1 = new GameObject("obj5", new Transform(new Vector2f(100, 700), new Vector2f(256, 256)));
+        object1.addComponent(new SpriteRenderer(spriteSheet.getSprite(2)));
+        addGameObject(object1);
     }
 
     private void loadResources() {
         AssetPool.getShader("default");
-        AssetPool.addSpriteSheet("spritesheets/spritesheet.png",
-                new SpriteSheet(AssetPool.getTexture("spritesheets/spritesheet.png"),
-                        16, 16, 32, 0));
+        AssetPool.addSpriteSheet("spritesheets/cat1.png",
+                new SpriteSheet(AssetPool.getTexture("spritesheets/cat1.png"),
+                        131, 240, 50, 0));
     }
+
+    private int spriteIndex = 0;
+    private float spriteFlipTime = 0.2f;
+    private float spriteFlitTimeLeft = 0.0f;
 
     @Override
     public void update(float dt) {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
+        spriteFlitTimeLeft -= dt;
+        if (spriteFlitTimeLeft <= 0) {
+            spriteFlitTimeLeft = spriteFlipTime;
+            spriteIndex++;
+            if (spriteIndex > 4) {
+                spriteIndex = 0;
+            }
+            object1.getComponent(SpriteRenderer.class).setSprite(spriteSheet.getSprite(spriteIndex));
+        }
 
+        object1.transform.position.x += dt * 30;
 
 
 
