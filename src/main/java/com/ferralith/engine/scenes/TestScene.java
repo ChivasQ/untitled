@@ -39,7 +39,7 @@ public class TestScene extends Scene {
         addGameObject(obj2);
 
         GameObject obj3 = new GameObject("obj3", new Transform(new Vector2f(600, 100), new Vector2f(256, 256)));
-        obj3.addComponent(new SpriteRenderer(AssetPool.getTexture("test_image.png")));
+        obj3.addComponent(new SpriteRenderer(AssetPool.getTexture("google.png")));
         addGameObject(obj3);
 
         GameObject obj4 = new GameObject("obj4", new Transform(new Vector2f(600, 500), new Vector2f(256, 256)));

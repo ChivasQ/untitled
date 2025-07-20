@@ -162,6 +162,10 @@ public class Window {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // чтобы сообщения приходили немедленно
         glDebugMessageCallback(debugCallback, 0);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
         Window.changeScene(1);
     }
 

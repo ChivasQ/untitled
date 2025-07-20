@@ -4,6 +4,7 @@ import com.ferralith.engine.Window;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.Time;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -19,7 +20,7 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_ERROR;
 import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
-public class RenderBatch {
+public class RenderBatch implements Comparable<RenderBatch>{
     // TODO: some bugs with batch, redo
     // Vertex
     // ======
@@ -47,12 +48,14 @@ public class RenderBatch {
     private int vaoID, vboID;
     private int maxBatchSize;
     private Shader shader;
+    private int zIndex;
 
-    public RenderBatch(int maxBatchSize) {
+    public RenderBatch(int maxBatchSize, int zIndex) {
         shader = AssetPool.getShader("default");
         shader.compile();
         this.sprites = new SpriteRenderer[maxBatchSize];
         this.maxBatchSize = maxBatchSize;
+        this.zIndex = zIndex;
 
         // 4 vertices quads
         vertices = new float[maxBatchSize * 4 * VERTEX_SIZE];
@@ -244,5 +247,14 @@ public class RenderBatch {
 
     public boolean hasTexture(Texture texture) {
         return textures.contains(texture);
+    }
+
+    public int getzIndex() {
+        return zIndex;
+    }
+
+    @Override
+    public int compareTo(@NotNull RenderBatch o) {
+        return Integer.compare(this.zIndex, o.zIndex);
     }
 }
