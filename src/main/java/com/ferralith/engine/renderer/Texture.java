@@ -1,7 +1,10 @@
 package com.ferralith.engine.renderer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryStack;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.logging.Logger;
@@ -11,6 +14,8 @@ import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.stb.STBImage.*;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Texture {
     private String path;
@@ -30,28 +35,47 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        IntBuffer width = BufferUtils.createIntBuffer(1);
-        IntBuffer height = BufferUtils.createIntBuffer(1);
-        IntBuffer channels = BufferUtils.createIntBuffer(1);
-        stbi_set_flip_vertically_on_load(true);
-        ByteBuffer image = stbi_load(this.path, width, height, channels, 0);
+        try {
+            stbi_set_flip_vertically_on_load(true);
 
-        if (image != null) {
-            this.width = width.get(0);
-            this.height = height.get(0);
-
-            if (channels.get(0) == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this.width, this.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-            } else if (channels.get(0) == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-            } else {
-                assert false : "Error: (Texture) unknown number of channels: '" + channels.get(0) + "'";
+            InputStream is = getClass().getClassLoader().getResourceAsStream(this.path);
+            if (is == null) {
+                throw new RuntimeException("Resource not found in JAR: " + this.path);
             }
-        } else {
-            assert false : "Error: (Texture) Could not load image '" + path + "'";
-        }
+            byte[] bytes = is.readAllBytes();
+            ByteBuffer imageBuffer = memAlloc(bytes.length);
+            imageBuffer.put(bytes).flip();
+            ByteBuffer image = null;
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer x = stack.mallocInt(1);
+                IntBuffer y = stack.mallocInt(1);
+                IntBuffer channels = stack.mallocInt(1);
 
-        stbi_image_free(image);
+                image = stbi_load_from_memory(imageBuffer, x, y, channels, 0);
+                if (image == null) {
+                    throw new RuntimeException("Failed to load image: " + stbi_failure_reason());
+                }
+
+                this.width = x.get(0);
+                this.height = y.get(0);
+                System.out.println("Loaded texture: " + path + " " + width + "x" + height);
+                if (channels.get(0) == 3) {
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this.width, this.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+                } else if (channels.get(0) == 4) {
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+                } else {
+                    assert false : "Error: (Texture) unknown number of channels: '" + channels.get(0) + "'";
+                }
+
+
+
+            } finally {
+                if (image != null) stbi_image_free(image);
+                memFree(imageBuffer);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load resource: " + path, e);
+        }
     }
 
     public void bind() {

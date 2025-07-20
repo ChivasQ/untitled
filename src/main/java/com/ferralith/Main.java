@@ -7,6 +7,6 @@ import com.ferralith.engine.Window;
 public class Main {
     public static void main(String[] args) {
         Window w = Window.get();
-        w.setSize(512, 512).setTitle("a").run();
+        w.setSize(1024, 1024).setTitle("a").run();
     }
 }

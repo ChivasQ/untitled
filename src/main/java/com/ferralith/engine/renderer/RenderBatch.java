@@ -4,8 +4,10 @@ import com.ferralith.engine.Window;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.Time;
+import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -52,6 +54,7 @@ public class RenderBatch {
 
         this.numSprites = 0;
         this.hasRoom = true;
+        this.textures = new ArrayList<>();
     }
 
     public void start() {
@@ -76,6 +79,12 @@ public class RenderBatch {
 
         glVertexAttribPointer(1, COLOR_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, COLOR_OFFSET);
         glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, TEX_COORDS_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEX_COORDS_OFFSET);
+        glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(3, TEX_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEX_ID_OFFSET);
+        glEnableVertexAttribArray(3);
     }
 
     private int[] generateIndices() {
@@ -96,17 +105,31 @@ public class RenderBatch {
         shader.use();
         shader.uploadMat4f("uProjection", Window.getScene().getCamera().getProjectionMatrix());
         shader.uploadMat4f("uView", Window.getScene().getCamera().getViewMatrix());
+        for (int i = 0; i < textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            textures.get(i).bind();
+        }
+        shader.uploadIntArray("uTextures", texSlots);
 
         glBindVertexArray(vaoID);
+
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(3);
 
         glDrawElements(GL_TRIANGLES, this.numSprites * 6, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(3);
 
         glBindVertexArray(0);
+
+        for (int i = 0; i < textures.size(); i++) {
+            textures.get(i).unbind();
+        }
 
         shader.detach();
     }
@@ -115,6 +138,15 @@ public class RenderBatch {
         int index = this.numSprites;
         this.sprites[index] = renderer;
         this.numSprites++;
+
+        if (renderer.getTexture() != null) {
+            if(!textures.contains(renderer.getTexture())) {
+                textures.add(renderer.getTexture());
+            }
+        }
+        if (textures.size() >= 8) {
+            this.hasRoom = false;
+        }
 
         loadVertexProperties(index);
 
@@ -129,6 +161,18 @@ public class RenderBatch {
         int offset = index * 4 * VERTEX_SIZE;
 
         Vector4f color = spr.getColor();
+        Vector2f[] texCoords = spr.getTexCoords();
+
+        int texID = 0;
+        if (spr.getTexture() != null) {
+            for (int i = 0; i < textures.size(); i++) {
+                if (textures.get(i) == spr.getTexture()) {
+                    texID = i;
+                    break;
+                }
+            }
+        }
+
 
 
         float xAdd = 1.0f;
@@ -141,14 +185,22 @@ public class RenderBatch {
             } else if (i == 3) {
                 yAdd = 1.0f;
             }
-
+            // Load position
             vertices[offset] = spr.gameObject.transform.position.x + (xAdd * spr.gameObject.transform.scale.x);
             vertices[offset + 1] = spr.gameObject.transform.position.y + (yAdd * spr.gameObject.transform.scale.y);
 
+            // Load color
             vertices[offset + 2] = color.x;
             vertices[offset + 3] = color.y;
             vertices[offset + 4] = color.z;
             vertices[offset + 5] = color.w;
+
+            // Load texture coords
+            vertices[offset + 6] = texCoords[i].x;
+            vertices[offset + 7] = texCoords[i].y;
+
+            // Load texture id
+            vertices[offset + 8] = texID;
 
             offset += VERTEX_SIZE;
         }
