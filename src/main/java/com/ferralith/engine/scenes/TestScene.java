@@ -5,6 +5,8 @@ import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.utils.AssetPool;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -15,6 +17,10 @@ public class TestScene extends Scene {
     private boolean initialized = false;
     private GameObject object1;
     private SpriteSheet spriteSheet;
+    Gson gson = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .create();
+
     public TestScene() {
         System.out.println("TEST SCENE");
     }
@@ -51,6 +57,12 @@ public class TestScene extends Scene {
         object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
         addGameObject(object1);
         this.activeGameObject = object1;
+
+        String serialized = gson.toJson(object1);
+        System.out.println(serialized);
+        // TODO: FIX ISSUE WITH ABSTRACT CLASS
+        //GameObject obj = gson.fromJson(serialized, object1.getClass());
+//        System.out.println(obj);
     }
 
     private void loadResources() {
@@ -95,5 +107,9 @@ public class TestScene extends Scene {
         ImGui.begin("Test window");
         ImGui.text("HEAVEN PIERCE HER");
         ImGui.end();
+
+        if (ImGui.button("Serialize!")) {
+            System.out.println(gson.toJson(object1));
+        }
     }
 }

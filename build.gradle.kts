@@ -5,6 +5,7 @@ val lwjglVersion = "3.3.6"
 val jomlVersion = "1.10.8"
 val lwjglNatives = "natives-windows"
 val imguiVersion = "1.89.0"
+val gsonVersion = "2.13.1"
 
 plugins {
     id("java")
@@ -37,4 +38,6 @@ dependencies {
     implementation("io.github.spair:imgui-java-lwjgl3:$imguiVersion")
 
     implementation("io.github.spair:imgui-java-natives-windows:$imguiVersion")
+
+    implementation("com.google.code.gson:gson:$gsonVersion")
 }

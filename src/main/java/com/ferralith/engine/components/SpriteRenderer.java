@@ -10,10 +10,13 @@ import org.joml.Vector4f;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public class SpriteRenderer extends Component {
-    private Vector4f color;
-    private Sprite sprite;
-    private Transform lastTransform;
-    private boolean isDirty = false;
+    private Vector4f color = new Vector4f(1);
+    private Sprite sprite = new Sprite();
+    private transient Transform lastTransform;
+    private transient boolean isDirty = false;
+
+    public SpriteRenderer() {
+    }
 
     public SpriteRenderer(Vector4f color) {
         this.color = color;
