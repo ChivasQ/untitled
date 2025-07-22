@@ -5,8 +5,10 @@ import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
 import com.ferralith.engine.utils.Time;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.MemoryStack;
@@ -23,10 +25,13 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class Window {
-    private int width, height;
+    private int width;
+    private int height;
     private String title;
     private long glfwWindow;
     public float r, b, g;
+    private ImGuiWrapper imGuiWrapper;
+    private boolean isResized = false;
 
     private static Window window = null;
 
@@ -69,6 +74,7 @@ public class Window {
     public static Scene getScene() {
         return get().currentScene;
     }
+
 
     public Window setSize(int width, int height) {
         this.height = height;
@@ -146,8 +152,21 @@ public class Window {
                     (vidmode.width() - pWidth.get(0)) / 2,
                     (vidmode.height() - pHeight.get(0)) / 2
             );
-        } // the stack frame is popped automatically
+        }
 
+        org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback(glfwWindow, new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(final long window, final int width, final int height) {
+                Window.get().setSize(width, height);
+                isResized = true;
+                //update(0);
+            }
+        });
+
+        glfwSetFramebufferSizeCallback(glfwWindow, (window, width, height) -> {
+            glViewport(0, 0, width, height);
+            isResized = true;
+        });
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
@@ -158,13 +177,16 @@ public class Window {
         glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
-// Устанавливаем callback
+
         glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // чтобы сообщения приходили немедленно
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(debugCallback, 0);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+        this.imGuiWrapper = new ImGuiWrapper(glfwWindow);
+        this.imGuiWrapper.initImGui();
 
         Window.changeScene(1);
     }
@@ -175,24 +197,43 @@ public class Window {
         float dt = -1.0f;
 
         while(!glfwWindowShouldClose(glfwWindow)) {
-            glfwPollEvents();
-
-            glClearColor(r, g, b, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
-                glfwSetWindowShouldClose(glfwWindow, true);
-            }
-
-            if (dt >= 0) {
-                currentScene.update(dt);
-            }
-
-            glfwSwapBuffers(glfwWindow);
+            update(dt);
 
             endTime = Time.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
         }
+    }
+
+    private void update(float dt) {
+        glfwPollEvents();
+
+        glClearColor(r, g, b, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
+            glfwSetWindowShouldClose(glfwWindow, true);
+        }
+
+        if (dt >= 0) {
+            currentScene.update(dt);
+        }
+        this.imGuiWrapper.update(dt);
+        glfwSwapBuffers(glfwWindow);
+
+        if (isResized) {
+            System.out.println("Window is resized(" + width + ", " + height + "): adjusting perspective...");
+            currentScene.camera.adjustProjective();
+            isResized = false;
+        }
+    }
+
+
+    public static int getHeight() {
+        return get().height;
+    }
+
+    public static int getWidth() {
+        return get().width;
     }
 }

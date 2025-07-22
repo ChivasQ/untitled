@@ -212,12 +212,12 @@ public class RenderBatch implements Comparable<RenderBatch>{
             vertices[offset + 7] = texCoords[i].y;
 
             // Load texture id
-            System.out.println(texID);
+            //System.out.println(texID);
             vertices[offset + 8] = texID;
 
             offset += VERTEX_SIZE;
         }
-        System.out.println("Textures in batch: " + textures.size());
+        //System.out.println("Textures in batch: " + textures.size());
     }
 
     private void loadElementIndices(int[] elements, int i) {

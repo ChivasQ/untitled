@@ -23,7 +23,7 @@ public class LevelScene extends Scene {
 
     @Override
     public void init() {
-        this.camera = new Camera(new Vector2f(-500,-59));
+        this.camera = new Camera(new Vector2f(-0,-0));
     }
 
     @Override

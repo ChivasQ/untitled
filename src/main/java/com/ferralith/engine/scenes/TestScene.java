@@ -28,9 +28,9 @@ public class TestScene extends Scene {
 
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
 
-        this.camera = new Camera(new Vector2f(-250,0));
+        this.camera = new Camera(new Vector2f(-100,100));
 
-        GameObject obj1 = new GameObject("obj1", new Transform(new Vector2f(-300, 100), new Vector2f(511, 511)));
+        GameObject obj1 = new GameObject("obj1", new Transform(new Vector2f(Window.getWidth() - 300, Window.getHeight()-100), new Vector2f(256, 256)));
         obj1.addComponent(new SpriteRenderer(AssetPool.getTexture("fumo2.png")));
         addGameObject(obj1);
 
@@ -42,11 +42,11 @@ public class TestScene extends Scene {
         obj3.addComponent(new SpriteRenderer(AssetPool.getTexture("google.png")));
         addGameObject(obj3);
 
-        GameObject obj4 = new GameObject("obj4", new Transform(new Vector2f(600, 500), new Vector2f(256, 256)));
+        GameObject obj4 = new GameObject("obj4", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
         obj4.addComponent(new SpriteRenderer(spriteSheet.getSprite(0)));
         addGameObject(obj4);
 
-        object1 = new GameObject("obj5", new Transform(new Vector2f(100, 700), new Vector2f(256, 256)));
+        object1 = new GameObject("obj5", new Transform(new Vector2f(0, 500), new Vector2f(256, 256)));
         object1.addComponent(new SpriteRenderer(spriteSheet.getSprite(2)));
         addGameObject(object1);
     }

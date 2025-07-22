@@ -18,11 +18,12 @@ public class Camera {
     public void adjustProjective() {
         projectionMatrix.identity();
         projectionMatrix.ortho( 0.0f,
-                                32.0f * 40.0f,
+                                Window.getWidth(),
                                 0.0f,
-                                32.0f * 40.0f,
+                                Window.getHeight(),
                                 0.0f,
                                 100.0f);
+        //projectionMatrix.ortho2D(0, Window.getWidth(), 0,  Window.getHeight());
     }
 
     public Matrix4f getViewMatrix() {
