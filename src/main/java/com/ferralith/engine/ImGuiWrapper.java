@@ -1,20 +1,12 @@
 package com.ferralith.engine;
 
-import imgui.ImFontAtlas;
-import imgui.ImFontConfig;
-import imgui.ImGui;
-import imgui.ImGuiIO;
-import imgui.callback.ImStrConsumer;
-import imgui.callback.ImStrSupplier;
-import imgui.flag.ImGuiBackendFlags;
+import com.ferralith.engine.utils.AssetPool;
+import imgui.*;
 import imgui.flag.ImGuiConfigFlags;
-import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import org.lwjgl.glfw.GLFW;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 public class ImGuiWrapper {
 
@@ -37,13 +29,36 @@ public class ImGuiWrapper {
     public void initImGui() {
 
         ImGui.createContext();
+
+        final ImGuiIO io = ImGui.getIO();
+
+        io.setIniFilename("imgui.ini");
+
+
+
+        io.getFonts().setFreeTypeRenderer(true);
+
+        final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
+        rangesBuilder.addRanges(io.getFonts().getGlyphRangesDefault());
+        rangesBuilder.addRanges(io.getFonts().getGlyphRangesCyrillic());
+        rangesBuilder.addRanges(io.getFonts().getGlyphRangesJapanese());
+
+        final ImFontConfig fontConfig = new ImFontConfig();
+        fontConfig.setMergeMode(false);  // Enable merge mode to merge cyrillic, japanese and icons with default font
+        fontConfig.setPixelSnapH(true);
+
+        final short[] glyphRanges = rangesBuilder.buildRanges();
+        io.getFonts().addFontFromMemoryTTF(AssetPool.loadFontFromResources("assets/fonts/VCR_OSD_MONO_1.001.ttf"), 18, fontConfig, glyphRanges); // cyrillic glyphs
+
+        fontConfig.destroy();
         imGuiImplGlfw.init(glfwWindow, true);
         imGuiGl3.init(glslVersion);
     }
 
-    public void update(float dt) {
+    public void update(float dt, Scene currentScene) {
         startFrame();
-        ImGui.showDemoWindow();
+        currentScene.sceneImgui();
+//        ImGui.showDemoWindow();
         endFrame();
     }
 

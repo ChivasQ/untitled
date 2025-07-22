@@ -5,6 +5,7 @@ import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.utils.AssetPool;
+import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -47,8 +48,9 @@ public class TestScene extends Scene {
         addGameObject(obj4);
 
         object1 = new GameObject("obj5", new Transform(new Vector2f(0, 500), new Vector2f(256, 256)));
-        object1.addComponent(new SpriteRenderer(spriteSheet.getSprite(2)));
+        object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
         addGameObject(object1);
+        this.activeGameObject = object1;
     }
 
     private void loadResources() {
@@ -67,17 +69,17 @@ public class TestScene extends Scene {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-        spriteFlitTimeLeft -= dt;
-        if (spriteFlitTimeLeft <= 0) {
-            spriteFlitTimeLeft = spriteFlipTime;
-            spriteIndex++;
-            if (spriteIndex > 4) {
-                spriteIndex = 0;
-            }
-            object1.getComponent(SpriteRenderer.class).setSprite(spriteSheet.getSprite(spriteIndex));
-        }
-
-        object1.transform.position.x += dt * 30;
+//        spriteFlitTimeLeft -= dt;
+//        if (spriteFlitTimeLeft <= 0) {
+//            spriteFlitTimeLeft = spriteFlipTime;
+//            spriteIndex++;
+//            if (spriteIndex > 4) {
+//                spriteIndex = 0;
+//            }
+//            //object1.getComponent(SpriteRenderer.class).setSprite(spriteSheet.getSprite(spriteIndex));
+//        }
+//
+//        object1.transform.position.x += dt * 30;
 
 
 
@@ -86,5 +88,12 @@ public class TestScene extends Scene {
         }
 
         this.renderer.render();
+    }
+
+    @Override
+    public void imgui() {
+        ImGui.begin("Test window");
+        ImGui.text("HEAVEN PIERCE HER");
+        ImGui.end();
     }
 }

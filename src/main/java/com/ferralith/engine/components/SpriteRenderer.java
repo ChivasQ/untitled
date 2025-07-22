@@ -3,30 +3,34 @@ package com.ferralith.engine.components;
 import com.ferralith.engine.Component;
 import com.ferralith.engine.Transform;
 import com.ferralith.engine.renderer.Texture;
+import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public class SpriteRenderer extends Component {
-    Vector4f color;
+    private Vector4f color;
     private Sprite sprite;
     private Transform lastTransform;
-    private boolean isDirty = true;
+    private boolean isDirty = false;
 
     public SpriteRenderer(Vector4f color) {
         this.color = color;
         this.sprite = new Sprite(null);
+        this.setDirty();
     }
 
     public SpriteRenderer(Sprite sprite) {
         this.sprite = sprite;
         this.color = new Vector4f(1);
+        this.setDirty();
     }
 
     public SpriteRenderer(Texture texture) {
         this.sprite = new Sprite(texture);
         this.color = new Vector4f(1);
+        this.setDirty();
     }
     @Override
     public void start() {
@@ -75,5 +79,15 @@ public class SpriteRenderer extends Component {
 
     public boolean isDirty() {
         return this.isDirty;
+    }
+
+    @Override
+    public void imgui() {
+        float[] imColor = {color.x, color.y, color.z, color.w};
+        if (ImGui.colorPicker4("Color Picker: ", imColor)) {
+            System.out.println("COLOR CHANGED");
+            this.color.set(imColor[0], imColor[1], imColor[2], imColor[3]);
+            this.setDirty();
+        }
     }
 }

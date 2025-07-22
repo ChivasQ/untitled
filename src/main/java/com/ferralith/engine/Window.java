@@ -5,6 +5,8 @@ import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
 import com.ferralith.engine.utils.Time;
+import imgui.ImGui;
+import imgui.ImGuiIO;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -93,6 +95,14 @@ public class Window {
         init();
         loop();
 
+        close();
+    }
+
+    private void close() {
+//        ImGuiIO io = ImGui.getIO();
+//        io.setWantSaveIniSettings(true);
+
+
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(glfwWindow);
         glfwDestroyWindow(glfwWindow);
@@ -102,7 +112,7 @@ public class Window {
         glfwSetErrorCallback(null).free();
     }
 
-    public void init() {
+    private void init() {
         GLFWErrorCallback.createPrint(System.err).set();
 
         // Функция обратного вызова
@@ -154,7 +164,7 @@ public class Window {
             );
         }
 
-        org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback(glfwWindow, new GLFWWindowSizeCallback() {
+        glfwSetWindowSizeCallback(glfwWindow, new GLFWWindowSizeCallback() {
             @Override
             public void invoke(final long window, final int width, final int height) {
                 Window.get().setSize(width, height);
@@ -191,7 +201,7 @@ public class Window {
         Window.changeScene(1);
     }
 
-    public void loop() {
+    private void loop() {
         float beginTime = Time.getTime();
         float endTime;
         float dt = -1.0f;
@@ -218,7 +228,7 @@ public class Window {
         if (dt >= 0) {
             currentScene.update(dt);
         }
-        this.imGuiWrapper.update(dt);
+        this.imGuiWrapper.update(dt, currentScene);
         glfwSwapBuffers(glfwWindow);
 
         if (isResized) {

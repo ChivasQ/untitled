@@ -73,7 +73,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
         vboID = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
 
-        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
         // Create and upload indices buff
         int eboID = glGenBuffers();
@@ -125,7 +125,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
         shader.uploadMat4f("uProjection", Window.getScene().getCamera().getProjectionMatrix());
         shader.uploadMat4f("uView", Window.getScene().getCamera().getViewMatrix());
         for (int i = 0; i < textures.size(); i++) {
-            glActiveTexture(GL_TEXTURE0 + i);
+            glActiveTexture(GL_TEXTURE0 + i + 1);
             textures.get(i).bind();
         }
         shader.uploadIntArray("uTextures", texSlots);
@@ -179,7 +179,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
         if (spr.getTexture() != null) {
             for (int i = 0; i < textures.size(); i++) {
                 if (textures.get(i).equals(spr.getTexture())) {
-                    texID = i;
+                    texID = i + 1;
                     break;
                 }
             }
