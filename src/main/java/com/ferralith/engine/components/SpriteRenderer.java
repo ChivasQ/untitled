@@ -73,6 +73,10 @@ public class SpriteRenderer extends Component {
         setDirty();
     }
 
+    public Sprite getSprite() {
+        return sprite;
+    }
+
     public void setColor(Vector4f color) {
         if (this.color.equals(color)) return;
 
@@ -88,7 +92,7 @@ public class SpriteRenderer extends Component {
     public void imgui() {
         float[] imColor = {color.x, color.y, color.z, color.w};
         if (ImGui.colorPicker4("Color Picker: ", imColor)) {
-            System.out.println("COLOR CHANGED");
+            //System.out.println("COLOR CHANGED");
             this.color.set(imColor[0], imColor[1], imColor[2], imColor[3]);
             this.setDirty();
         }

@@ -17,7 +17,7 @@ import org.joml.Vector4f;
 import java.awt.event.KeyEvent;
 
 public class TestScene extends Scene {
-    private boolean initialized = false;
+
     private GameObject object1;
     private SpriteSheet spriteSheet;
 
@@ -25,24 +25,15 @@ public class TestScene extends Scene {
         System.out.println("TEST SCENE");
     }
 
-    public void start() {
-        if (this.loadedLevel) {
-            super.start();
-            return;
-        }
-
-        super.start();
-    }
-
     @Override
     public void init() {
-        if (initialized) return;
-        initialized = true;
-
         loadResources();
-
         this.camera = new Camera(new Vector2f(-100,100));
+
         System.out.println(this.loadedLevel);
+        if (loadedLevel) {
+            return;
+        }
 
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
 
@@ -75,28 +66,11 @@ public class TestScene extends Scene {
                         131, 240, 50, 0));
     }
 
-    private int spriteIndex = 0;
-    private float spriteFlipTime = 0.2f;
-    private float spriteFlitTimeLeft = 0.0f;
-
     @Override
     public void update(float dt) {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-//        spriteFlitTimeLeft -= dt;
-//        if (spriteFlitTimeLeft <= 0) {
-//            spriteFlitTimeLeft = spriteFlipTime;
-//            spriteIndex++;
-//            if (spriteIndex > 4) {
-//                spriteIndex = 0;
-//            }
-//            //object1.getComponent(SpriteRenderer.class).setSprite(spriteSheet.getSprite(spriteIndex));
-//        }
-//
-//        object1.transform.position.x += dt * 30;
-
-
 
         for (GameObject go : this.gameObjects) {
             go.update(dt);

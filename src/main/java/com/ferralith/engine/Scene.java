@@ -102,17 +102,16 @@ public abstract class Scene {
 
         try {
             inFile = new String(Files.readAllBytes(Paths.get("level.txt")));
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         if (!inFile.equals("")) {
-            GameObject[] objects = gson.fromJson(inFile, GameObject[].class);
+            GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
 
-            for (int i = 0; i < objects.length; i++) {
-                addGameObject(gameObjects.get(i));
-                System.out.println(gameObjects.get(i).name);
+            for (int i = 0; i < objs.length; i++) {
+                addGameObject(objs[i]);
+                System.out.println(objs[i].name);
             }
             this.loadedLevel = true;
         }

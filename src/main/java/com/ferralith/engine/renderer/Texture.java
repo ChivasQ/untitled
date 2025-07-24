@@ -23,6 +23,9 @@ public class Texture {
     private int width;
     private int height;
 
+    public Texture() {
+    }
+
     public Texture(String path) {
         this.path = path;
 

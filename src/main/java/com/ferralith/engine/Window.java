@@ -57,6 +57,7 @@ public class Window {
                 break;
             case 1:
                 currentScene = new TestScene();
+                currentScene.load();
                 currentScene.init();
                 currentScene.start();
                 break;
@@ -115,17 +116,6 @@ public class Window {
     private void init() {
         GLFWErrorCallback.createPrint(System.err).set();
 
-        // Функция обратного вызова
-        GLDebugMessageCallback debugCallback = GLDebugMessageCallback.create((source, type, id, severity, length, message, userParam) -> {
-            String msg = GLDebugMessageCallback.getMessage(length, message);
-            System.err.println("OpenGL DEBUG MESSAGE:");
-            System.err.println("Source: " + source);
-            System.err.println("Type: " + getType(type));
-            System.err.println("Severity: " + severity);
-            System.err.println("Message: " + msg);
-        });
-
-
         if ( !glfwInit() )
             throw new IllegalStateException("Unable to initialize GLFW");
 
@@ -136,8 +126,9 @@ public class Window {
 
         // Create the window
         glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
-        if ( glfwWindow == NULL )
+        if ( glfwWindow == NULL ) {
             throw new RuntimeException("Failed to create the GLFW window");
+        }
 
         glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
@@ -188,13 +179,8 @@ public class Window {
 
         GL.createCapabilities();
 
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(debugCallback, 0);
-
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
         this.imGuiWrapper = new ImGuiWrapper(glfwWindow);
         this.imGuiWrapper.initImGui();
 
@@ -206,8 +192,7 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
-        // TODO: I DON'T LIKE IT, MOVE SOMEWHERE
-        currentScene.load();
+
 
         while(!glfwWindowShouldClose(glfwWindow)) {
             update(dt);
@@ -224,7 +209,7 @@ public class Window {
     private void update(float dt) {
         glfwPollEvents();
 
-        glClearColor(r, g, b, 0.0f);
+        glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
