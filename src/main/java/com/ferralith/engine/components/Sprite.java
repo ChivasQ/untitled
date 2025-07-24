@@ -4,6 +4,8 @@ import com.ferralith.engine.renderer.Texture;
 import org.joml.Vector2f;
 
 public class Sprite {
+    private float width, height;
+
     private Texture texture = null;
     private Vector2f[] textureCoords = {
             new Vector2f(1, 1),
@@ -14,6 +16,8 @@ public class Sprite {
 
     public Sprite(Texture texture) {
         this.texture = texture;
+        setHeight(texture.getHeight());
+        setWidth(texture.getWidth());
     }
 
     public Sprite(Texture texture, Vector2f[] textureCoords) {
@@ -30,5 +34,25 @@ public class Sprite {
 
     public Vector2f[] getTextureCoords() {
         return textureCoords;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public int getTexId() {
+        return texture == null ? -1 : texture.getId();
     }
 }

@@ -1,5 +1,8 @@
 package com.ferralith.engine.inputs;
 
+import com.ferralith.engine.Window;
+import org.joml.Vector4f;
+
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
@@ -64,6 +67,30 @@ public class MouseListener {
 
     public static float getY() {
         return (float)get().yPos;
+    }
+
+    public static float getOrthoX() {
+        float currentX = getX();
+        currentX = (currentX / (float) Window.getWidth()) * 2.0f - 1.0f;
+        Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
+
+        tmp.mul(Window.getScene().getCamera().getInverseProjection())
+                .mul(Window.getScene().getCamera().getInverseView());
+        currentX = tmp.x;
+
+        return currentX;
+    }
+
+    public static float getOrthoY() {
+        float currentY = getY();
+        currentY = (currentY / (float) Window.getHeight()) * 2.0f - 1.0f;
+        Vector4f tmp = new Vector4f(0, currentY, 0, 1);
+
+        tmp.mul(Window.getScene().getCamera().getInverseProjection())
+                .mul(Window.getScene().getCamera().getInverseView());
+        currentY = tmp.y;
+
+        return currentY;
     }
 
     public static float getDx() {
