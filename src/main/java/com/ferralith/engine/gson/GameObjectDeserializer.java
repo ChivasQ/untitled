@@ -39,10 +39,10 @@ public class GameObjectDeserializer implements JsonDeserializer<GameObject> {
 //                    }
                 }
 
-                go.addComponent(c);
+
             }
-            return go;
+            go.addComponent(c);
         }
-        return null;
+        return go;
     }
 }

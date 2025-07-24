@@ -1,6 +1,7 @@
 package com.ferralith.engine.scenes;
 
 import com.ferralith.engine.*;
+import com.ferralith.engine.components.RigidBody;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.gson.ComponentDeserializer;
@@ -32,10 +33,17 @@ public class TestScene extends Scene {
 
         System.out.println(this.loadedLevel);
         if (loadedLevel) {
+            this.activeGameObject = gameObjects.get(0);
             return;
         }
 
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
+
+        object1 = new GameObject("obj51", new Transform(new Vector2f(0, 500), new Vector2f(256, 256)));
+        object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
+        object1.addComponent(new RigidBody());
+        addGameObject(object1);
+        this.activeGameObject = object1;
 
         GameObject obj1 = new GameObject("obj1", new Transform(new Vector2f(Window.getWidth() - 300, Window.getHeight()-100), new Vector2f(256, 256)));
         obj1.addComponent(new SpriteRenderer(AssetPool.getTexture("fumo2.png")));
@@ -53,10 +61,7 @@ public class TestScene extends Scene {
         obj4.addComponent(new SpriteRenderer(spriteSheet.getSprite(0)));
         addGameObject(obj4);
 
-        object1 = new GameObject("obj5", new Transform(new Vector2f(0, 500), new Vector2f(256, 256)));
-        object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
-        addGameObject(object1);
-        this.activeGameObject = object1;
+
     }
 
     private void loadResources() {
