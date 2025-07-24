@@ -1,8 +1,18 @@
 package com.ferralith.engine;
 
+import com.ferralith.engine.gson.ComponentDeserializer;
+import com.ferralith.engine.gson.ComponentSerializer;
+import com.ferralith.engine.gson.GameObjectDeserializer;
 import com.ferralith.engine.renderer.Renderer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import imgui.ImGui;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +23,7 @@ public abstract class Scene {
     private boolean isRunning = false;
     protected List<GameObject> gameObjects = new ArrayList<>();
     protected GameObject activeGameObject = null;
+    public boolean loadedLevel = false;
 
     public Scene() {
         
@@ -60,5 +71,50 @@ public abstract class Scene {
 
     public void imgui() {
 
+    }
+
+    public void save() {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Component.class, new ComponentDeserializer())
+                .registerTypeAdapter(Component.class, new ComponentSerializer())
+                .registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
+                .create();
+
+        try {
+            FileWriter fileWriter = new FileWriter("level.txt");
+            fileWriter.write(gson.toJson(this.gameObjects));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void load() {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Component.class, new ComponentDeserializer())
+                .registerTypeAdapter(Component.class, new ComponentSerializer())
+                .registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
+                .create();
+
+        String inFile = "";
+
+        try {
+            inFile = new String(Files.readAllBytes(Paths.get("level.txt")));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!inFile.equals("")) {
+            GameObject[] objects = gson.fromJson(inFile, GameObject[].class);
+
+            for (int i = 0; i < objects.length; i++) {
+                addGameObject(gameObjects.get(i));
+                System.out.println(gameObjects.get(i).name);
+            }
+            this.loadedLevel = true;
+        }
     }
 }

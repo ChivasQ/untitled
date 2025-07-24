@@ -206,6 +206,9 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
+        // TODO: I DON'T LIKE IT, MOVE SOMEWHERE
+        currentScene.load();
+
         while(!glfwWindowShouldClose(glfwWindow)) {
             update(dt);
 
@@ -213,6 +216,9 @@ public class Window {
             dt = endTime - beginTime;
             beginTime = endTime;
         }
+
+        // TODO: SAME
+        currentScene.save();
     }
 
     private void update(float dt) {

@@ -3,6 +3,9 @@ package com.ferralith.engine.scenes;
 import com.ferralith.engine.*;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.components.SpriteSheet;
+import com.ferralith.engine.gson.ComponentDeserializer;
+import com.ferralith.engine.gson.ComponentSerializer;
+import com.ferralith.engine.gson.GameObjectDeserializer;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.utils.AssetPool;
 import com.google.gson.Gson;
@@ -17,12 +20,18 @@ public class TestScene extends Scene {
     private boolean initialized = false;
     private GameObject object1;
     private SpriteSheet spriteSheet;
-    Gson gson = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create();
 
     public TestScene() {
         System.out.println("TEST SCENE");
+    }
+
+    public void start() {
+        if (this.loadedLevel) {
+            super.start();
+            return;
+        }
+
+        super.start();
     }
 
     @Override
@@ -32,10 +41,10 @@ public class TestScene extends Scene {
 
         loadResources();
 
+        this.camera = new Camera(new Vector2f(-100,100));
+        System.out.println(this.loadedLevel);
 
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
-
-        this.camera = new Camera(new Vector2f(-100,100));
 
         GameObject obj1 = new GameObject("obj1", new Transform(new Vector2f(Window.getWidth() - 300, Window.getHeight()-100), new Vector2f(256, 256)));
         obj1.addComponent(new SpriteRenderer(AssetPool.getTexture("fumo2.png")));
@@ -57,12 +66,6 @@ public class TestScene extends Scene {
         object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
         addGameObject(object1);
         this.activeGameObject = object1;
-
-        String serialized = gson.toJson(object1);
-        System.out.println(serialized);
-        // TODO: FIX ISSUE WITH ABSTRACT CLASS
-        //GameObject obj = gson.fromJson(serialized, object1.getClass());
-//        System.out.println(obj);
     }
 
     private void loadResources() {
@@ -109,7 +112,7 @@ public class TestScene extends Scene {
         ImGui.end();
 
         if (ImGui.button("Serialize!")) {
-            System.out.println(gson.toJson(object1));
+            //System.out.println(gson.toJson(object1));
         }
     }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameObject {
-    private String name;
+    public String name;
     private List<Component> components;
     public Transform transform;
     private int zIndex;
