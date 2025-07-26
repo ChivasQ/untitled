@@ -11,6 +11,8 @@ import com.ferralith.engine.gson.GameObjectDeserializer;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.utils.AssetPool;
+import com.ferralith.engine.utils.GenObject;
+import com.ferralith.engine.utils.MouseControls;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
@@ -24,6 +26,9 @@ public class TestScene extends Scene {
 
     private GameObject object1;
     private SpriteSheet spriteSheet;
+
+    MouseControls mouseControls = new MouseControls();
+
 
     public TestScene() {
         System.out.println("TEST SCENE");
@@ -81,7 +86,9 @@ public class TestScene extends Scene {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-        MouseListener.getOrthoX();
+
+        mouseControls.update(dt);
+
         for (GameObject go : this.gameObjects) {
             go.update(dt);
         }
@@ -110,6 +117,8 @@ public class TestScene extends Scene {
             ImGui.pushID(i);
             if (ImGui.imageButton("hello" + id, id, sWidth, sHeight, texCoords[0].x, texCoords[0].y, texCoords[2].x, texCoords[2].y)) {
                 System.out.println("click " + i);
+                GameObject object = GenObject.generateSpriteObject(sprite, sWidth, sHeight);
+                mouseControls.pickupObject(object);
             }
             ImGui.popID();
 

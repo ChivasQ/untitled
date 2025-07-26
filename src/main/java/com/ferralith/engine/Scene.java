@@ -107,12 +107,31 @@ public abstract class Scene {
         }
 
         if (!inFile.equals("")) {
+            int maxGameObjectId = -1;
+            int maxComponentId = -1;
+
             GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
 
             for (int i = 0; i < objs.length; i++) {
                 addGameObject(objs[i]);
                 System.out.println(objs[i].name);
+
+                for (Component c : objs[i].getAllComponents()) {
+                    if (c.getUid() > maxComponentId) {
+                        maxComponentId = c.getUid();
+                    }
+                }
+
+                if (objs[i].getUid() > maxGameObjectId) {
+                    maxGameObjectId = objs[i].getUid();
+                }
             }
+
+            maxComponentId++;
+            maxGameObjectId++;
+
+            GameObject.init(maxGameObjectId);
+            Component.init(maxComponentId);
             this.loadedLevel = true;
         }
     }
