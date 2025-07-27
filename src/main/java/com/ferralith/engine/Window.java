@@ -2,17 +2,14 @@ package com.ferralith.engine;
 
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
 import com.ferralith.engine.utils.Time;
-import imgui.ImGui;
-import imgui.ImGuiIO;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.MemoryStack;
 
 import static java.lang.Character.getType;
@@ -23,7 +20,6 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class Window {
@@ -67,7 +63,7 @@ public class Window {
         }
     }
 
-    public static Window get() {
+    public static Window getInstance() {
         if (Window.window == null)
             Window.window = new Window();
 
@@ -75,7 +71,7 @@ public class Window {
     }
 
     public static Scene getScene() {
-        return get().currentScene;
+        return getInstance().currentScene;
     }
 
 
@@ -158,7 +154,7 @@ public class Window {
         glfwSetWindowSizeCallback(glfwWindow, new GLFWWindowSizeCallback() {
             @Override
             public void invoke(final long window, final int width, final int height) {
-                Window.get().setSize(width, height);
+                Window.getInstance().setSize(width, height);
                 isResized = true;
                 //update(0);
             }
@@ -209,6 +205,8 @@ public class Window {
     private void update(float dt) {
         glfwPollEvents();
 
+        DebugDraw.beginFrame();
+
         glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -217,6 +215,7 @@ public class Window {
         }
 
         if (dt >= 0) {
+            DebugDraw.draw();
             currentScene.update(dt);
         }
         this.imGuiWrapper.update(dt, currentScene);
@@ -231,10 +230,10 @@ public class Window {
 
 
     public static int getHeight() {
-        return get().height;
+        return getInstance().height;
     }
 
     public static int getWidth() {
-        return get().width;
+        return getInstance().width;
     }
 }

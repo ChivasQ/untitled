@@ -10,6 +10,7 @@ import com.ferralith.engine.gson.ComponentSerializer;
 import com.ferralith.engine.gson.GameObjectDeserializer;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.GenObject;
 import com.ferralith.engine.utils.MouseControls;
@@ -18,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import imgui.ImGui;
 import imgui.ImVec2;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.awt.event.KeyEvent;
@@ -39,6 +41,7 @@ public class TestScene extends Scene {
         loadResources();
         this.camera = new Camera(new Vector2f(-100,100));
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
+        DebugDraw.addLine2D(new Vector2f(0,0), new Vector2f(1000, 1000), new Vector3f(1,0,0));
         System.out.println(this.loadedLevel);
         if (loadedLevel) {
             this.activeGameObject = gameObjects.get(0);

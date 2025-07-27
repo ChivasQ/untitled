@@ -6,7 +6,7 @@ import com.ferralith.engine.Window;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
-        Window w = Window.get();
+        Window w = Window.getInstance();
         w.setSize(1024, 1024).setTitle("a").run();
     }
 }
