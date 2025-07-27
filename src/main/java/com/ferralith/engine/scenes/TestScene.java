@@ -118,7 +118,7 @@ public class TestScene extends Scene {
 
 
             ImGui.pushID(i);
-            if (ImGui.imageButton("hello" + id, id, sWidth, sHeight, texCoords[0].x, texCoords[0].y, texCoords[2].x, texCoords[2].y)) {
+            if (ImGui.imageButton("hello" + id, id, sWidth, sHeight, texCoords[3].x, texCoords[3].y, texCoords[1].x, texCoords[1].y)) {
                 System.out.println("click " + i);
                 GameObject object = GenObject.generateSpriteObject(sprite, sWidth, sHeight);
                 mouseControls.pickupObject(object);
