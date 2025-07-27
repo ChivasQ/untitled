@@ -27,6 +27,8 @@ public class DebugDraw {
 
     private static boolean started = false;
 
+    private static float lineWidth = 1.0f;
+
     public static void start() {
         vaoID = glGenVertexArrays();
         glBindVertexArray(vaoID);
@@ -42,7 +44,7 @@ public class DebugDraw {
         glEnableVertexAttribArray(1);
 
         // TODO: SET LINE WIDTH
-        glLineWidth(2.0f);
+        glLineWidth(lineWidth);
     }
 
     public static void beginFrame() {
@@ -102,12 +104,16 @@ public class DebugDraw {
         shader.detach();
     }
 
+    public static void setLineWidth(float lineWidth) {
+        DebugDraw.lineWidth = lineWidth;
+    }
+
     public static void addLine2D(Vector2f from, Vector2f to) {
         addLine2D(from, to, new Vector3f(1, 0, 0),1);
     }
 
     public static void addLine2D(Vector2f from, Vector2f to, Vector3f color) {
-        addLine2Di(from, to, color);
+        addLine2D(from, to, color, 1);
     }
 
     public static void addLine2Di(Vector2f from, Vector2f to, Vector3f color) {
@@ -122,4 +128,8 @@ public class DebugDraw {
         DebugDraw.lines.add(new Line2D(from, to, color, lifetime));
     }
 
+    public static void addLine2D(Vector2f from, Vector2f to, Vector3f color, int lifetime, int width) {
+        setLineWidth(width);
+        addLine2D(from, to, color, lifetime);
+    }
 }

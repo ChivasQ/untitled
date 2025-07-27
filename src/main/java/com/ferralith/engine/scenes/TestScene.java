@@ -1,21 +1,12 @@
 package com.ferralith.engine.scenes;
 
 import com.ferralith.engine.*;
-import com.ferralith.engine.components.RigidBody;
-import com.ferralith.engine.components.Sprite;
-import com.ferralith.engine.components.SpriteRenderer;
-import com.ferralith.engine.components.SpriteSheet;
-import com.ferralith.engine.gson.ComponentDeserializer;
-import com.ferralith.engine.gson.ComponentSerializer;
-import com.ferralith.engine.gson.GameObjectDeserializer;
+import com.ferralith.engine.components.*;
 import com.ferralith.engine.inputs.KeyListener;
-import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.GenObject;
-import com.ferralith.engine.utils.MouseControls;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.ferralith.engine.components.MouseControls;
 import imgui.ImGui;
 import imgui.ImVec2;
 import org.joml.Vector2f;
@@ -29,7 +20,8 @@ public class TestScene extends Scene {
     private GameObject object1;
     private SpriteSheet spriteSheet;
 
-    MouseControls mouseControls = new MouseControls();
+    GameObject levelEditorMagicNumbers = new GameObject("levelEditorMagicNumbers");
+
 
 
     public TestScene() {
@@ -38,6 +30,9 @@ public class TestScene extends Scene {
 
     @Override
     public void init() {
+        levelEditorMagicNumbers.addComponent(new MouseControls());
+        levelEditorMagicNumbers.addComponent(new GridLines());
+
         loadResources();
         this.camera = new Camera(new Vector2f(-100,100));
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
@@ -50,27 +45,27 @@ public class TestScene extends Scene {
 
 
 
-        object1 = new GameObject("obj51", new Transform(new Vector2f(0, 500), new Vector2f(256, 256)));
-        object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
-        object1.addComponent(new RigidBody());
-        addGameObject(object1);
-        this.activeGameObject = object1;
+//        object1 = new GameObject("obj51", new Transform(new Vector2f(0, 500), new Vector2f(256, 256)));
+//        object1.addComponent(new SpriteRenderer(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f)));
+//        object1.addComponent(new RigidBody());
+//        addGameObject(object1);
+        //this.activeGameObject = object1;
 
-        GameObject obj1 = new GameObject("obj1", new Transform(new Vector2f(Window.getWidth() - 300, Window.getHeight()-100), new Vector2f(256, 256)));
-        obj1.addComponent(new SpriteRenderer(AssetPool.getTexture("fumo2.png")));
-        addGameObject(obj1);
-
-        GameObject obj2 = new GameObject("obj2", new Transform(new Vector2f(100, 100), new Vector2f(511, 511)));
-        obj2.addComponent(new SpriteRenderer(AssetPool.getTexture("testImage.png")));
-        addGameObject(obj2);
-
-        GameObject obj3 = new GameObject("obj3", new Transform(new Vector2f(600, 100), new Vector2f(256, 256)));
-        obj3.addComponent(new SpriteRenderer(AssetPool.getTexture("google.png")));
-        addGameObject(obj3);
-
-        GameObject obj4 = new GameObject("obj4", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
-        obj4.addComponent(new SpriteRenderer(spriteSheet.getSprite(0)));
-        addGameObject(obj4);
+//        GameObject obj1 = new GameObject("obj1", new Transform(new Vector2f(Window.getWidth() - 300, Window.getHeight()-100), new Vector2f(256, 256)));
+//        obj1.addComponent(new SpriteRenderer(AssetPool.getTexture("fumo2.png")));
+//        addGameObject(obj1);
+//
+//        GameObject obj2 = new GameObject("obj2", new Transform(new Vector2f(100, 100), new Vector2f(511, 511)));
+//        obj2.addComponent(new SpriteRenderer(AssetPool.getTexture("testImage.png")));
+//        addGameObject(obj2);
+//
+//        GameObject obj3 = new GameObject("obj3", new Transform(new Vector2f(600, 100), new Vector2f(256, 256)));
+//        obj3.addComponent(new SpriteRenderer(AssetPool.getTexture("google.png")));
+//        addGameObject(obj3);
+//
+//        GameObject obj4 = new GameObject("obj4", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
+//        obj4.addComponent(new SpriteRenderer(spriteSheet.getSprite(0)));
+//        addGameObject(obj4);
 
 
     }
@@ -90,7 +85,7 @@ public class TestScene extends Scene {
             Window.changeScene(0);
         }
 
-        mouseControls.update(dt);
+        levelEditorMagicNumbers.update(dt);
 
         for (GameObject go : this.gameObjects) {
             go.update(dt);
@@ -121,7 +116,7 @@ public class TestScene extends Scene {
             if (ImGui.imageButton("hello" + id, id, sWidth, sHeight, texCoords[3].x, texCoords[3].y, texCoords[1].x, texCoords[1].y)) {
                 System.out.println("click " + i);
                 GameObject object = GenObject.generateSpriteObject(sprite, sWidth, sHeight);
-                mouseControls.pickupObject(object);
+                levelEditorMagicNumbers.getComponent(MouseControls.class).pickupObject(object);
             }
             ImGui.popID();
 

@@ -1,4 +1,4 @@
-package com.ferralith.engine.utils;
+package com.ferralith.engine.components;
 
 import com.ferralith.engine.Component;
 import com.ferralith.engine.GameObject;
@@ -24,12 +24,12 @@ public class MouseControls extends Component {
     @Override
     public void update(float dt) {
         if (holdingObject != null) {
-            int gridsize = 100;
+            int gridsize = 32;
 
             float orthoX = MouseListener.getOrthoX();
             float orthoY = MouseListener.getOrthoY();
-            holdingObject.transform.position.x = (orthoX - (orthoX % gridsize)) - 16;
-            holdingObject.transform.position.y = (orthoY - (orthoY % gridsize)) - 16;
+            holdingObject.transform.position.x = (orthoX - (orthoX % gridsize));
+            holdingObject.transform.position.y = (orthoY - (orthoY % gridsize));
 
             if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
                 place();
