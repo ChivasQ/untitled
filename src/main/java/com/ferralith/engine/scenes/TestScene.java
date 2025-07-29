@@ -39,7 +39,7 @@ public class TestScene extends Scene {
         DebugDraw.addLine2D(new Vector2f(0,0), new Vector2f(1000, 1000), new Vector3f(1,0,0));
         System.out.println(this.loadedLevel);
         if (loadedLevel) {
-            this.activeGameObject = gameObjects.get(0);
+            //this.activeGameObject = gameObjects.get(0);
             return;
         }
 
@@ -78,14 +78,19 @@ public class TestScene extends Scene {
                 new SpriteSheet(AssetPool.getTexture("spritesheets/cat1.png"),
                         131, 240, 50, 0));
     }
-
+    float counter = 1;
     @Override
     public void update(float dt) {
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);
         }
-
+        counter += dt * 200;
         levelEditorMagicNumbers.update(dt);
+
+        DebugDraw.addBox2D(new Vector2f(544, 800), new Vector2f(128, 64), counter, new Vector3f(1,0,0), 1);
+        DebugDraw.addLine2D(new Vector2f(544, 800), new Vector2f(544, 801), new Vector3f(1,1,1));
+
+        //DebugDraw.addPolygon(new Vector2f(544, 800), 128, new Vector3f(1,0,0), 1, (int) counter);
 
         for (GameObject go : this.gameObjects) {
             go.update(dt);

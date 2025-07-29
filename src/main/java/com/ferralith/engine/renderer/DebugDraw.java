@@ -2,6 +2,7 @@ package com.ferralith.engine.renderer;
 
 import com.ferralith.engine.Window;
 import com.ferralith.engine.utils.AssetPool;
+import com.ferralith.engine.utils.Mth;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -116,13 +117,9 @@ public class DebugDraw {
         addLine2D(from, to, color, 1);
     }
 
-    public static void addLine2Di(Vector2f from, Vector2f to, Vector3f color) {
-        if (lines.size() >= MAX_LINES) return;
-
-        DebugDraw.lines.add(new Line2D(from, to, color));
-    }
 
     public static void addLine2D(Vector2f from, Vector2f to, Vector3f color, int lifetime) {
+        //System.out.println(lines.size());
         if (lines.size() >= MAX_LINES) return;
 
         DebugDraw.lines.add(new Line2D(from, to, color, lifetime));
@@ -131,5 +128,53 @@ public class DebugDraw {
     public static void addLine2D(Vector2f from, Vector2f to, Vector3f color, int lifetime, int width) {
         setLineWidth(width);
         addLine2D(from, to, color, lifetime);
+    }
+
+    public static void addBox2D(Vector2f center, Vector2f size, float angle, Vector3f color, int lifetime) {
+        Vector2f halfSize = new Vector2f(size).mul(0.5f);
+
+        Vector2f min = new Vector2f(center).sub(halfSize);
+        Vector2f max = new Vector2f(center).add(halfSize);
+
+        Vector2f[] vectices = {
+            new Vector2f(min.x, min.y),
+            new Vector2f(min.x, max.y),
+            new Vector2f(max.x, max.y),
+            new Vector2f(max.x, min.y)
+        };
+
+        if (angle != 0.0) {
+            for (int i = 0; i < vectices.length; i++) {
+                Mth.rotate(vectices[i], center, angle);
+            }
+        }
+
+        addLine2D(vectices[0], vectices[1], color, lifetime);
+        addLine2D(vectices[1], vectices[2], color, lifetime);
+        addLine2D(vectices[2], vectices[3], color, lifetime);
+        addLine2D(vectices[3], vectices[0], color, lifetime);
+    }
+
+    public static void addPolygon(Vector2f center, float radius, Vector3f color, int lifetime, int vectices) {
+        Vector2f[] points = new Vector2f[vectices];
+
+        int increment = 360 / vectices;
+        int currentAngle = 0;
+
+        for (int i = 0; i < vectices; i++) {
+            Vector2f tmp = new Vector2f(radius, 0);
+            Mth.rotate(tmp, new Vector2f(), currentAngle);
+            points[i] = new Vector2f(tmp).add(center);
+            if (i > 0) {
+                //System.out.println(points[i - 1].toString());
+                addLine2D(points[i - 1], points[i], color, lifetime);
+            }
+            currentAngle += increment;
+        }
+        addLine2D(points[0], points[vectices - 1]);
+    }
+
+    public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime) {
+        addPolygon(center,radius, color, lifetime, 16);
     }
 }

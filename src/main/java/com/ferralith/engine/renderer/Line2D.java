@@ -8,7 +8,6 @@ public class Line2D {
     private Vector2f to;
     private Vector3f color;
     private int lifetime;
-    private boolean invincible = false;
 
     public Line2D(Vector2f from, Vector2f to, Vector3f color, int lifetime) {
         this.from = from;
@@ -17,18 +16,8 @@ public class Line2D {
         this.lifetime = lifetime;
     }
 
-    public Line2D(Vector2f from, Vector2f to, Vector3f color) {
-        this.from = from;
-        this.to = to;
-        this.color = color;
-        this.invincible = true;
-        this.lifetime = 1;
-    }
-
     public int beginFrame() {
-        if (!invincible) {
-            this.lifetime--;
-        }
+        this.lifetime--;
         return this.lifetime;
     }
 
