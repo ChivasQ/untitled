@@ -1,5 +1,6 @@
 package com.ferralith.engine;
 
+import com.ferralith.editor.GameViewWindow;
 import com.ferralith.engine.utils.AssetPool;
 import imgui.*;
 import imgui.flag.*;
@@ -61,6 +62,7 @@ public class ImGuiWrapper {
         setupDockSpace();
         currentScene.sceneImgui();
         ImGui.showDemoWindow();
+        GameViewWindow.imgui();
         ImGui.end();
         ImGui.render();
         endFrame();

@@ -41,9 +41,9 @@ public class Window {
         this.height =  100;
         this.width =  100;
         this.title =  "title";
-        this.r = 0.1f;
+        this.r = 1f;
         this.g = 0.2f;
-        this.b = 0.1f;
+        this.b = 1f;
     }
 
     public static void changeScene(int newScene) {
@@ -74,6 +74,14 @@ public class Window {
 
     public static Scene getScene() {
         return getInstance().currentScene;
+    }
+
+    public static Framebuffer getFramebuffer() {
+        return getInstance().framebuffer;
+    }
+
+    public static float getTargetAspectRatio() {
+        return 16.0f / 9.0f;
     }
 
 
@@ -163,7 +171,7 @@ public class Window {
         });
 
         glfwSetFramebufferSizeCallback(glfwWindow, (window, width, height) -> {
-            glViewport(0, 0, width, height);
+            //glViewport(0, 0, width, height);
             isResized = true;
         });
 
@@ -179,10 +187,11 @@ public class Window {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
         this.imGuiWrapper = new ImGuiWrapper(glfwWindow);
         this.imGuiWrapper.initImGui();
 
-        this.framebuffer = new Framebuffer(512, 512);
+        this.framebuffer = new Framebuffer(1024, 1024);
 
         Window.changeScene(1);
     }
@@ -209,6 +218,8 @@ public class Window {
     private void update(float dt) {
         glfwPollEvents();
 
+
+
         DebugDraw.beginFrame();
 
         glClearColor(r, g, b, 1.0f);
@@ -218,13 +229,19 @@ public class Window {
             glfwSetWindowShouldClose(glfwWindow, true);
         }
 
-        //this.framebuffer.bind();
+        this.framebuffer.bind();
+
         if (dt >= 0) {
-            DebugDraw.draw();
             currentScene.update(dt);
+            DebugDraw.draw();
         }
+
         this.framebuffer.unbind();
 
+//        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.getFboID());
+//        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+//        glBlitFramebuffer(0, 0, framebuffer.width, framebuffer.height, 0, 0, this.width, this.height,
+//                GL_COLOR_BUFFER_BIT, GL_NEAREST);
         this.imGuiWrapper.update(dt, currentScene);
         glfwSwapBuffers(glfwWindow);
 
