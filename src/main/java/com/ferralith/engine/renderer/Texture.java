@@ -81,6 +81,17 @@ public class Texture {
         }
     }
 
+
+
+    public Texture(int width, int height) {
+        this.path = "Generated";
+
+        texID = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texID);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    }
+
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, texID);
     }

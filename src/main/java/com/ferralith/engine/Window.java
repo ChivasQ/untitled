@@ -3,6 +3,7 @@ package com.ferralith.engine;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.renderer.DebugDraw;
+import com.ferralith.engine.renderer.Framebuffer;
 import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
 import com.ferralith.engine.utils.Time;
@@ -30,6 +31,7 @@ public class Window {
     public float r, b, g;
     private ImGuiWrapper imGuiWrapper;
     private boolean isResized = false;
+    private Framebuffer framebuffer;
 
     private static Window window = null;
 
@@ -180,6 +182,8 @@ public class Window {
         this.imGuiWrapper = new ImGuiWrapper(glfwWindow);
         this.imGuiWrapper.initImGui();
 
+        this.framebuffer = new Framebuffer(512, 512);
+
         Window.changeScene(1);
     }
 
@@ -214,10 +218,13 @@ public class Window {
             glfwSetWindowShouldClose(glfwWindow, true);
         }
 
+        //this.framebuffer.bind();
         if (dt >= 0) {
             DebugDraw.draw();
             currentScene.update(dt);
         }
+        this.framebuffer.unbind();
+
         this.imGuiWrapper.update(dt, currentScene);
         glfwSwapBuffers(glfwWindow);
 
