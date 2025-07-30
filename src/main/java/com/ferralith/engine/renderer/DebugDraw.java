@@ -153,6 +153,7 @@ public class DebugDraw {
         addLine2D(vectices[1], vectices[2], color, lifetime);
         addLine2D(vectices[2], vectices[3], color, lifetime);
         addLine2D(vectices[3], vectices[0], color, lifetime);
+
     }
 
     public static void addPolygon(Vector2f center, float radius, Vector3f color, int lifetime, int vectices) {

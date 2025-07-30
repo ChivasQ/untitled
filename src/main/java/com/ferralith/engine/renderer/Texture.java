@@ -100,4 +100,21 @@ public class Texture {
     public int getId() {
         return texID;
     }
+
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Texture)) return false;
+
+        Texture tex = (Texture) obj;
+
+        return  tex.getWidth() == this.getWidth() &&
+                tex.getHeight() == this.getHeight() &&
+                tex.getId() == this.getId() &&
+                tex.getPath().equals(this.getPath());
+    }
 }
