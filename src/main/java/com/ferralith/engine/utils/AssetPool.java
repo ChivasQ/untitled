@@ -33,7 +33,13 @@ public class AssetPool {
     }
 
     public static Texture getTexture(String resourceName) {
-        File file = new File(Paths.TEXTURE_PATH + resourceName);
+        File file;
+        if (resourceName.contains(Paths.TEXTURE_PATH)) {
+            file = new File(resourceName);
+        } else {
+            file = new File(Paths.TEXTURE_PATH + resourceName);
+        }
+
         if (AssetPool.textures.containsKey(file.getAbsolutePath())) {
             return AssetPool.textures.get(file.getAbsolutePath());
         } else {

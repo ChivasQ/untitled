@@ -19,7 +19,7 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Texture {
     private String path;
-    private int texID;
+    private transient int texID;
     private int width;
     private int height;
 

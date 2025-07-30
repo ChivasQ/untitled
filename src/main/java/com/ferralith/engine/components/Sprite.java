@@ -55,4 +55,8 @@ public class Sprite {
     public int getTexId() {
         return texture == null ? -1 : texture.getId();
     }
+
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
 }

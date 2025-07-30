@@ -97,4 +97,8 @@ public class SpriteRenderer extends Component {
             this.setDirty();
         }
     }
+
+    public void setTexture(Texture texture) {
+        this.sprite.setTexture(texture);
+    }
 }

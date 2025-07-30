@@ -2,10 +2,10 @@ package com.ferralith.engine;
 
 import com.ferralith.engine.utils.AssetPool;
 import imgui.*;
-import imgui.flag.ImGuiConfigFlags;
-import imgui.flag.ImGuiMouseCursor;
+import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
+import imgui.type.ImBoolean;
 import org.lwjgl.glfw.GLFW;
 
 public class ImGuiWrapper {
@@ -33,7 +33,7 @@ public class ImGuiWrapper {
         final ImGuiIO io = ImGui.getIO();
 
         io.setIniFilename("imgui.ini");
-
+        io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 
 
         io.getFonts().setFreeTypeRenderer(true);
@@ -57,9 +57,31 @@ public class ImGuiWrapper {
 
     public void update(float dt, Scene currentScene) {
         startFrame();
+
+        setupDockSpace();
         currentScene.sceneImgui();
-//        ImGui.showDemoWindow();
+        ImGui.showDemoWindow();
+        ImGui.end();
+        ImGui.render();
         endFrame();
+    }
+
+    private void setupDockSpace() {
+        int windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
+
+        ImGui.setNextWindowPos(0.0f, 0.0f, ImGuiCond.Always);
+        ImGui.setNextWindowSize(Window.getWidth(), Window.getHeight());
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
+        windowFlags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
+
+        ImGui.begin("Dockspace Demo", new ImBoolean(true), windowFlags);
+        ImGui.popStyleVar(2);
+
+        // Dockspace
+
+        ImGui.dockSpace(ImGui.getID("Dockspace"));
     }
 
     protected void startFrame() {
@@ -69,7 +91,6 @@ public class ImGuiWrapper {
     }
 
     protected void endFrame() {
-        ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());
 
         // Update and Render additional Platform Windows
@@ -84,6 +105,8 @@ public class ImGuiWrapper {
 
         //renderBuffer();
     }
+
+
 
     protected void disposeImGui() {
         ImGui.destroyContext();

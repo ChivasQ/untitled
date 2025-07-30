@@ -77,7 +77,17 @@ public class TestScene extends Scene {
         AssetPool.addSpriteSheet("spritesheets/cat1.png",
                 new SpriteSheet(AssetPool.getTexture("spritesheets/cat1.png"),
                         131, 240, 50, 0));
+
+        for (GameObject g : gameObjects) {
+            if (g.getComponent(SpriteRenderer.class) != null) {
+                SpriteRenderer spriteRenderer = g.getComponent(SpriteRenderer.class);
+                if (spriteRenderer.getTexture() != null) {
+                    spriteRenderer.setTexture(AssetPool.getTexture(spriteRenderer.getTexture().getPath()));
+                }
+            }
+        }
     }
+
     float counter = 1;
     @Override
     public void update(float dt) {
