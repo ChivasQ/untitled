@@ -6,6 +6,7 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 
 public class GameViewWindow {
+    // TODO: FIX IMAGE SIZE
     public static void imgui() {
         ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
 
@@ -14,7 +15,7 @@ public class GameViewWindow {
 
         ImGui.setCursorPos(windowPos.x, windowPos.y);
         int textureID = Window.getFramebuffer().getTextureID();
-        //System.out.println(textureID);
+        System.out.println(textureID);
         ImGui.image(textureID, windowSize.x, windowSize.y, 0, 1, 1, 0);
 
         ImGui.end();
@@ -34,13 +35,10 @@ public class GameViewWindow {
 
     private static ImVec2 getLargestSizeForViewport() {
         ImVec2 windowSize = new ImVec2();
-        ImGui.getContentRegionAvail();
-        windowSize.x -= ImGui.getScrollX();
-        windowSize.y -= ImGui.getScrollY();
+        ImGui.getContentRegionAvail(windowSize);
 
         float aspectWidth = windowSize.x;
         float aspectHeight = aspectWidth / Window.getTargetAspectRatio();
-
         if (aspectHeight > windowSize.y) {
             aspectHeight = windowSize.y;
             aspectWidth = aspectHeight * Window.getTargetAspectRatio();

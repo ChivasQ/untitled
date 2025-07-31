@@ -129,7 +129,7 @@ public class Window {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
-
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
         // Create the window
         glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
         if ( glfwWindow == NULL ) {
@@ -191,7 +191,7 @@ public class Window {
         this.imGuiWrapper = new ImGuiWrapper(glfwWindow);
         this.imGuiWrapper.initImGui();
 
-        this.framebuffer = new Framebuffer(1024, 1024);
+        this.framebuffer = new Framebuffer(getWidth(),getHeight());
 
         Window.changeScene(1);
     }
@@ -221,7 +221,7 @@ public class Window {
 
 
         DebugDraw.beginFrame();
-
+        this.framebuffer.bind();
         glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -229,7 +229,7 @@ public class Window {
             glfwSetWindowShouldClose(glfwWindow, true);
         }
 
-        this.framebuffer.bind();
+
 
         if (dt >= 0) {
             currentScene.update(dt);
@@ -238,10 +238,6 @@ public class Window {
 
         this.framebuffer.unbind();
 
-//        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.getFboID());
-//        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-//        glBlitFramebuffer(0, 0, framebuffer.width, framebuffer.height, 0, 0, this.width, this.height,
-//                GL_COLOR_BUFFER_BIT, GL_NEAREST);
         this.imGuiWrapper.update(dt, currentScene);
         glfwSwapBuffers(glfwWindow);
 
