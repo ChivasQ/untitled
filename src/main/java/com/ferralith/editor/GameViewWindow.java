@@ -1,11 +1,15 @@
 package com.ferralith.editor;
 
 import com.ferralith.engine.Window;
+import com.ferralith.engine.inputs.MouseListener;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
+import org.joml.Vector2f;
 
 public class GameViewWindow {
+    private static float leftX, rightX, topY, bottomY;
+
     // TODO: FIX IMAGE SIZE
     public static void imgui() {
         ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -13,10 +17,25 @@ public class GameViewWindow {
         ImVec2 windowSize = getLargestSizeForViewport();
         ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
 
+
         ImGui.setCursorPos(windowPos.x, windowPos.y);
+
+        ImVec2 topLeft = ImGui.getCursorPos();
+        topLeft.x -= ImGui.getScrollX();
+        topLeft.y -= ImGui.getScrollY();
+
+        leftX = topLeft.x;
+        bottomY = topLeft.y;
+
+        rightX = topLeft.x + windowSize.x;
+        topY = topLeft.y + windowSize.y;
+
         int textureID = Window.getFramebuffer().getTextureID();
-        System.out.println(textureID);
+        //System.out.println(textureID);
         ImGui.image(textureID, windowSize.x, windowSize.y, 0, 1, 1, 0);
+
+        MouseListener.get().setGameViewportPos(new Vector2f(topLeft.x, topLeft.y));
+        MouseListener.get().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
 
         ImGui.end();
     }
@@ -45,5 +64,10 @@ public class GameViewWindow {
         }
 
         return new ImVec2(aspectWidth, aspectHeight);
+    }
+
+    public static boolean getWantCaptureMouse() {
+        return MouseListener.getX() >= leftX && MouseListener.getX() <= rightX &&
+                MouseListener.getY() >= bottomY && MouseListener.getY() <= topY;
     }
 }

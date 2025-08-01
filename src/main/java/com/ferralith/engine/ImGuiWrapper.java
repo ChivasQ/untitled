@@ -1,6 +1,7 @@
 package com.ferralith.engine;
 
 import com.ferralith.editor.GameViewWindow;
+import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.utils.AssetPool;
 import imgui.*;
 import imgui.flag.*;
@@ -8,6 +9,8 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImBoolean;
 import org.lwjgl.glfw.GLFW;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class ImGuiWrapper {
 
@@ -35,6 +38,28 @@ public class ImGuiWrapper {
 
         io.setIniFilename("imgui.ini");
         io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
+
+
+        glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {
+            final boolean[] mouseDown = new boolean[5];
+
+            mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
+            mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE;
+            mouseDown[2] = button == GLFW_MOUSE_BUTTON_3 && action != GLFW_RELEASE;
+            mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
+            mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
+
+            io.setMouseDown(mouseDown);
+
+            if (!io.getWantCaptureMouse() && mouseDown[1]) {
+                ImGui.setWindowFocus(null);
+            }
+
+
+            if (GameViewWindow.getWantCaptureMouse()) {
+                MouseListener.mouseButtonCallback(w, button, action, mods);
+            }
+        });
 
 
         io.getFonts().setFreeTypeRenderer(true);

@@ -55,7 +55,7 @@ public class DebugDraw {
         }
 
         for (int i = 0; i < lines.size(); i++) {
-            if (lines.get(i).beginFrame() < 0) {
+            if (lines.get(i).beginFrame() <= 0) {
                 lines.remove(i);
                 i--;
             }

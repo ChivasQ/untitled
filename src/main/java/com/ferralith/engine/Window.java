@@ -7,6 +7,9 @@ import com.ferralith.engine.renderer.Framebuffer;
 import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
 import com.ferralith.engine.utils.Time;
+import imgui.ImGui;
+import imgui.ImGuiViewport;
+import imgui.internal.ImGuiWindow;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
@@ -166,14 +169,17 @@ public class Window {
             public void invoke(final long window, final int width, final int height) {
                 Window.getInstance().setSize(width, height);
                 isResized = true;
+                //glViewport(0, 0, width, height);
                 //update(0);
             }
         });
 
-        glfwSetFramebufferSizeCallback(glfwWindow, (window, width, height) -> {
-            //glViewport(0, 0, width, height);
-            isResized = true;
-        });
+//        glfwSetFramebufferSizeCallback(glfwWindow, (window, width, height) -> {
+//            glViewport(0, 0, width, height);
+//            isResized = true;
+//        });
+
+
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
@@ -201,8 +207,6 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
-
-
         while(!glfwWindowShouldClose(glfwWindow)) {
             update(dt);
 
@@ -218,16 +222,12 @@ public class Window {
     private void update(float dt) {
         glfwPollEvents();
 
-
-
         DebugDraw.beginFrame();
+
         this.framebuffer.bind();
+
         glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
-            glfwSetWindowShouldClose(glfwWindow, true);
-        }
 
 
 
@@ -239,11 +239,21 @@ public class Window {
         this.framebuffer.unbind();
 
         this.imGuiWrapper.update(dt, currentScene);
+
         glfwSwapBuffers(glfwWindow);
 
+        if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
+            glfwSetWindowShouldClose(glfwWindow, true);
+        }
+
         if (isResized) {
-            System.out.println("Window is resized(" + width + ", " + height + "): adjusting perspective...");
-            currentScene.camera.adjustProjective();
+            if (width == 0 && height == 0) {
+                System.out.println("Window is minimized.");
+            } else {
+                System.out.println("Window is resized(" + width + ", " + height + "): adjusting perspective...");
+                currentScene.camera.adjustProjective();
+            }
+
             isResized = false;
         }
     }
