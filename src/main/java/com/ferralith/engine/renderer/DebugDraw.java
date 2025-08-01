@@ -74,7 +74,7 @@ public class DebugDraw {
 
                 vertexArray[index] = pos.x;
                 vertexArray[index + 1] = pos.y;
-                vertexArray[index + 2] = -10;
+                vertexArray[index + 2] = 10;
 
                 vertexArray[index + 3] = color.x;
                 vertexArray[index + 4] = color.y;

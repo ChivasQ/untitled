@@ -37,4 +37,9 @@ public class LevelScene extends Scene {
             Window.changeScene(1);
         }
     }
+
+    @Override
+    public void render() {
+
+    }
 }

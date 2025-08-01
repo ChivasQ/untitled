@@ -2,10 +2,10 @@ package com.ferralith.engine;
 
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
-import com.ferralith.engine.renderer.DebugDraw;
-import com.ferralith.engine.renderer.Framebuffer;
+import com.ferralith.engine.renderer.*;
 import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
+import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.Time;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
@@ -35,10 +35,13 @@ public class Window {
     private ImGuiWrapper imGuiWrapper;
     private boolean isResized = false;
     private Framebuffer framebuffer;
+    private PickingTexture pickingTexture;
 
     private static Window window = null;
 
     private static Scene currentScene = null;
+    private Shader pickingShader;
+    private Shader defaultShader;
 
     public Window(){
         this.height =  100;
@@ -199,6 +202,8 @@ public class Window {
 
         this.framebuffer = new Framebuffer(getWidth(),getHeight());
 
+        this.pickingTexture = new PickingTexture(getWidth(),getHeight());
+
         Window.changeScene(1);
     }
 
@@ -206,6 +211,10 @@ public class Window {
         float beginTime = Time.getTime();
         float endTime;
         float dt = -1.0f;
+
+        // TODO: HELL NO;
+        defaultShader = AssetPool.getShader("default");
+        pickingShader = AssetPool.getShader("picking_shader");
 
         while(!glfwWindowShouldClose(glfwWindow)) {
             update(dt);
@@ -222,6 +231,8 @@ public class Window {
     private void update(float dt) {
         glfwPollEvents();
 
+        pickingTexture();
+
         DebugDraw.beginFrame();
 
         this.framebuffer.bind();
@@ -232,7 +243,9 @@ public class Window {
 
 
         if (dt >= 0) {
+            Renderer.bindShader(defaultShader);
             currentScene.update(dt);
+            currentScene.render();
             DebugDraw.draw();
         }
 
@@ -256,6 +269,27 @@ public class Window {
 
             isResized = false;
         }
+    }
+
+    private void pickingTexture() {
+        // Render pass for picking texture;
+        glDisable(GL_BLEND);
+        pickingTexture.enableWriting();
+        glViewport(0,0, getWidth(), getHeight());
+        glClearColor(0,0,0,0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        Renderer.bindShader(pickingShader);
+        currentScene.render();
+
+        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            int x = (int) MouseListener.getScreenX();
+            int y = (int) MouseListener.getScreenY();
+            System.out.println(pickingTexture.readPixel(x, y));
+        }
+
+        pickingTexture.disable();
+        glEnable(GL_BLEND);
     }
 
 
