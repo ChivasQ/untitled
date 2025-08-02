@@ -218,7 +218,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
             //System.out.println(texID);
             vertices[offset + 8] = texID;
 
-            vertices[offset + 9] = spr.gameObject.getUid();
+            vertices[offset + 9] = spr.gameObject.getUid() + 1;
 
             offset += VERTEX_SIZE;
         }

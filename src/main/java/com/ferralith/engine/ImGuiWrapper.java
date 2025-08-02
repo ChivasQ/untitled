@@ -1,7 +1,9 @@
 package com.ferralith.engine;
 
 import com.ferralith.editor.GameViewWindow;
+import com.ferralith.editor.PropertiesWindow;
 import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.renderer.PickingTexture;
 import com.ferralith.engine.utils.AssetPool;
 import imgui.*;
 import imgui.flag.*;
@@ -23,9 +25,13 @@ public class ImGuiWrapper {
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
     private final ImGuiImplGlfw imGuiImplGlfw = new ImGuiImplGlfw();
     private String glslVersion = "#version 330 core";
+    private GameViewWindow gameViewWindow;
+    private PropertiesWindow propertiesWindow;
 
-    public ImGuiWrapper(long glfwWindow) {
+    public ImGuiWrapper(long glfwWindow, PickingTexture pickingTexture) {
         this.glfwWindow = glfwWindow;
+        this.gameViewWindow = new GameViewWindow();
+        this.propertiesWindow = new PropertiesWindow(pickingTexture);
     }
 
 
@@ -49,14 +55,13 @@ public class ImGuiWrapper {
             mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
             mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
 
-            io.setMouseDown(mouseDown);
+            //io.setMouseDown(mouseDown);
 
             if (!io.getWantCaptureMouse() && mouseDown[1]) {
                 ImGui.setWindowFocus(null);
             }
-
-
-            if (GameViewWindow.getWantCaptureMouse()) {
+            //System.out.println(gameViewWindow.isHoveringViewport());
+            if (gameViewWindow.isHoveringViewport() && (!io.getWantCaptureMouse() || gameViewWindow.getWantCaptureMouse())) {
                 MouseListener.mouseButtonCallback(w, button, action, mods);
             }
         });
@@ -85,9 +90,11 @@ public class ImGuiWrapper {
         startFrame();
 
         setupDockSpace();
-        currentScene.sceneImgui();
+        currentScene.imgui();
         ImGui.showDemoWindow();
-        GameViewWindow.imgui();
+        gameViewWindow.imgui();
+        propertiesWindow.update(dt, currentScene);
+        propertiesWindow.imgui();
         ImGui.end();
         ImGui.render();
         endFrame();

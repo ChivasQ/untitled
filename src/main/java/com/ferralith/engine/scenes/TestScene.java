@@ -16,8 +16,6 @@ import org.joml.Vector4f;
 import java.awt.event.KeyEvent;
 
 public class TestScene extends Scene {
-
-    private GameObject object1;
     private SpriteSheet spriteSheet;
 
     GameObject levelEditorMagicNumbers = new GameObject("levelEditorMagicNumbers");
@@ -40,10 +38,8 @@ public class TestScene extends Scene {
         System.out.println(this.loadedLevel);
 
         if (loadedLevel) {
-            //this.activeGameObject = gameObjects.get(0);
             return;
         }
-
 
     }
 

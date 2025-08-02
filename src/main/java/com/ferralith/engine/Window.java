@@ -197,12 +197,11 @@ public class Window {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-        this.imGuiWrapper = new ImGuiWrapper(glfwWindow);
-        this.imGuiWrapper.initImGui();
-
         this.framebuffer = new Framebuffer(getWidth(),getHeight());
-
         this.pickingTexture = new PickingTexture(getWidth(),getHeight());
+
+        this.imGuiWrapper = new ImGuiWrapper(glfwWindow, pickingTexture);
+        this.imGuiWrapper.initImGui();
 
         Window.changeScene(1);
     }
@@ -281,13 +280,7 @@ public class Window {
 
         Renderer.bindShader(pickingShader);
         currentScene.render();
-
-        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            int x = (int) MouseListener.getScreenX();
-            int y = (int) MouseListener.getScreenY();
-            System.out.println(pickingTexture.readPixel(x, y));
-        }
-
+//
         pickingTexture.disable();
         glEnable(GL_BLEND);
     }

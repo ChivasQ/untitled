@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Scene {
 
@@ -22,7 +23,6 @@ public abstract class Scene {
     protected Camera camera;
     private boolean isRunning = false;
     protected List<GameObject> gameObjects = new ArrayList<>();
-    protected GameObject activeGameObject = null;
     public boolean loadedLevel = false;
 
     public Scene() {
@@ -57,16 +57,6 @@ public abstract class Scene {
 
     public Camera getCamera() {
         return this.camera;
-    }
-
-    public void sceneImgui() {
-        if (activeGameObject != null) {
-            ImGui.begin("Inspector");
-            activeGameObject.imgui();
-            ImGui.end();
-        }
-
-        imgui();
     }
 
     public void imgui() {
@@ -134,5 +124,10 @@ public abstract class Scene {
             Component.init(maxComponentId);
             this.loadedLevel = true;
         }
+    }
+
+    public GameObject getGameObject(int i) {
+        Optional<GameObject> gameObject = gameObjects.stream().filter(go -> go.getUid() == i).findFirst();
+        return gameObject.orElse(null);
     }
 }

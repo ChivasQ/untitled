@@ -16,6 +16,7 @@ public class PickingTexture {
         }
     }
     // TODO: REDO ALL ITS WORKING IN MAXIMIZED WINDOW ONLY
+    // TODO: I don't know how, but when resizing, I need to pass a new picking texture with new dimensions
     public boolean init(int width, int height) {
 
         fboID = glGenFramebuffers();
@@ -72,6 +73,6 @@ public class PickingTexture {
         float pixels[] = new float[3];
         glReadPixels(x, y ,1, 1, GL_RGB, GL_FLOAT, pixels);
 
-        return (int) pixels[0];
+        return (int)(pixels[0]) - 1;
     }
 }
