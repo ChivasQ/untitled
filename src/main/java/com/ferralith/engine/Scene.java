@@ -23,6 +23,7 @@ public abstract class Scene {
     protected Camera camera;
     private boolean isRunning = false;
     protected List<GameObject> gameObjects = new ArrayList<>();
+    private List<Component> sceneComponents = new ArrayList<>();
     public boolean loadedLevel = false;
 
     public Scene() {
@@ -52,7 +53,30 @@ public abstract class Scene {
             gameObjects.add(go);
         }
     }
-    public abstract void update(float dt);
+    public void update(float dt) {
+        updateComponents(dt);
+    }
+
+    public void updateComponents(float dt) {
+        for (Component c :
+                sceneComponents) {
+            c.update(dt);
+        }
+    }
+
+    public <T extends Component> T getComponent(Class<T> componentClass) {
+        for (Component c : sceneComponents) {
+            if (componentClass.isAssignableFrom(c.getClass())) {
+                try {
+                    return componentClass.cast(c);
+                } catch (ClassCastException e) {
+                    assert false : "Error: Casting component.";
+                }
+            }
+        }
+        return null;
+    }
+
     public abstract void render();
 
     public Camera getCamera() {
@@ -129,5 +153,9 @@ public abstract class Scene {
     public GameObject getGameObject(int i) {
         Optional<GameObject> gameObject = gameObjects.stream().filter(go -> go.getUid() == i).findFirst();
         return gameObject.orElse(null);
+    }
+
+    public void addSceneComponent(Component component) {
+        sceneComponents.add(component);
     }
 }

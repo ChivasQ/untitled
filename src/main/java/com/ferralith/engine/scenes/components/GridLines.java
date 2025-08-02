@@ -1,4 +1,4 @@
-package com.ferralith.engine.components;
+package com.ferralith.engine.scenes.components;
 
 import com.ferralith.engine.Component;
 import com.ferralith.engine.Window;
