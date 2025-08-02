@@ -1,4 +1,4 @@
-package com.ferralith.editor;
+package com.ferralith.engine.scenes.editor;
 
 import com.ferralith.engine.GameObject;
 import com.ferralith.engine.Scene;

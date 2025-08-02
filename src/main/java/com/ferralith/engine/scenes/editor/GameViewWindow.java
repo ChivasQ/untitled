@@ -1,4 +1,4 @@
-package com.ferralith.editor;
+package com.ferralith.engine.scenes.editor;
 
 import com.ferralith.engine.Window;
 import com.ferralith.engine.inputs.MouseListener;

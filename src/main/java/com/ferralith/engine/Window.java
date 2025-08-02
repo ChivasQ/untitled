@@ -218,6 +218,7 @@ public class Window {
         while(!glfwWindowShouldClose(glfwWindow)) {
             update(dt);
 
+            MouseListener.endFrame();
             endTime = Time.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;

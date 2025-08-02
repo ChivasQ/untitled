@@ -16,9 +16,9 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class DebugDraw {
-    private static int MAX_LINES = 500;
+    private static int MAX_LINES = 1000;
 
-    private static List<Line2D> lines = new ArrayList<>();
+    public static List<Line2D> lines = new ArrayList<>();
 
     private static float[] vertexArray = new float[MAX_LINES * 6 * 2];
     private static Shader shader = AssetPool.getShader("line2d");

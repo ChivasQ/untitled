@@ -63,6 +63,7 @@ public class TestScene extends Scene {
     @Override
     public void update(float dt) {
         updateComponents(dt);
+        camera.adjustProjective();
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
             Window.changeScene(0);

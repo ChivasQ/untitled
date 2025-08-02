@@ -1,5 +1,6 @@
 package com.ferralith.engine.scenes.components;
 
+import com.ferralith.engine.Camera;
 import com.ferralith.engine.Component;
 import com.ferralith.engine.Window;
 import com.ferralith.engine.renderer.DebugDraw;
@@ -13,17 +14,21 @@ public class GridLines extends Component {
 
     @Override
     public void update(float dt) {
-        Vector2f cameraPos = Window.getScene().getCamera().getPosition();
-        Vector2f projectionSize = new Vector2f(Window.getWidth(), Window.getHeight());
+        Camera camera = Window.getScene().getCamera();
+        // TODO: some lines still alive, fix
+//        System.out.println(camera.getZoom());
+//        if (camera.getZoom() > 5) return;
+        Vector2f cameraPos = camera.getPosition();
+        Vector2f projectionSize = camera.getProjectionSize();
 
         int firstX = ((int)((cameraPos.x / GRID_WIDTH) - 1)  * GRID_WIDTH);
         int firstY = ((int)((cameraPos.y / GRID_HEIGHT) - 1) * GRID_HEIGHT);
 
-        int numVtLines = (int)(projectionSize.x / GRID_WIDTH) + 2;
-        int numHzLines = (int)(projectionSize.y / GRID_HEIGHT) + 2;
+        int numVtLines = (int)(projectionSize.x * camera.getZoom() / GRID_WIDTH) + 2;
+        int numHzLines = (int)(projectionSize.y * camera.getZoom()  / GRID_HEIGHT) + 2;
 
-        int height = (int) projectionSize.y + GRID_HEIGHT * 2;
-        int width = (int) projectionSize.x + GRID_WIDTH * 2;
+        int height = (int) (projectionSize.y  * camera.getZoom()) + GRID_HEIGHT * 2;
+        int width = (int) (projectionSize.x  * camera.getZoom()) + GRID_WIDTH * 2;
 
         int maxLines = Math.max(numHzLines, numVtLines);
 

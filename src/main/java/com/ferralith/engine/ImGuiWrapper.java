@@ -1,7 +1,7 @@
 package com.ferralith.engine;
 
-import com.ferralith.editor.GameViewWindow;
-import com.ferralith.editor.PropertiesWindow;
+import com.ferralith.engine.scenes.editor.GameViewWindow;
+import com.ferralith.engine.scenes.editor.PropertiesWindow;
 import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.renderer.PickingTexture;
 import com.ferralith.engine.utils.AssetPool;
@@ -66,6 +66,11 @@ public class ImGuiWrapper {
             }
         });
 
+//        glfwSetScrollCallback(glfwWindow, (window, xoffset, yoffset) -> {
+//           io.setMouseWheelH(io.getMouseWheelH() + (float) xoffset);
+//           io.setMouseWheel(io.getMouseWheel() + (float) yoffset);
+//           MouseListener.mouseScrollCallback(window, xoffset, yoffset);
+//        });
 
         io.getFonts().setFreeTypeRenderer(true);
 
