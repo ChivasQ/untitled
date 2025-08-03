@@ -41,3 +41,42 @@ dependencies {
 
     implementation("com.google.code.gson:gson:$gsonVersion")
 }
+
+val copyAssets by tasks.registering(Copy::class) {
+    from("assets")
+    into("$buildDir/libs/assets")
+
+    from("level.txt")
+    into("$buildDir/libs")
+}
+
+val fatJar by tasks.registering(Jar::class) {
+    dependsOn(copyAssets)
+
+    archiveBaseName.set("${project.name}-fat")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+                mapOf(
+                        "Main-Class" to "com.ferralith.Main",
+                        "Class-Path" to configurations.compileClasspath.get()
+                                .joinToString(" ") { it.name }
+                )
+        )
+    }
+
+    from(sourceSets.main.get().output)
+
+    from({
+        configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+        }
+    })
+
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+}
+
+artifacts {
+    add("archives", fatJar)
+}
