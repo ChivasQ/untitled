@@ -5,6 +5,7 @@ import com.ferralith.engine.components.*;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.scenes.components.EditorCameraMovement;
+import com.ferralith.engine.scenes.components.Gizmo;
 import com.ferralith.engine.scenes.components.GridLines;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.GenObject;
@@ -28,12 +29,17 @@ public class TestScene extends Scene {
         loadResources();
         this.camera = new Camera(new Vector2f(-100,100));
         spriteSheet = AssetPool.getSpritesheet("spritesheets/cat1.png");
+        SpriteSheet gizmos = AssetPool.getSpritesheet("editor/gizmos.png");
+
         DebugDraw.addLine2D(new Vector2f(0,0), new Vector2f(1000, 1000), new Vector3f(1,0,0));
         System.out.println(this.loadedLevel);
 
         addSceneComponent(new MouseControls());
         addSceneComponent(new GridLines());
         addSceneComponent(new EditorCameraMovement(camera));
+        addSceneComponent(new Gizmo(gizmos.getSprite(1), Window.getImGuiWrapper().getPropertiesWindow()));
+
+        startSceneComponents();
 
         if (loadedLevel) {
             return;
@@ -48,6 +54,10 @@ public class TestScene extends Scene {
         AssetPool.addSpriteSheet("spritesheets/cat1.png",
                 new SpriteSheet(AssetPool.getTexture("spritesheets/cat1.png"),
                         131, 240, 50, 0));
+        AssetPool.addSpriteSheet("editor/gizmos.png",
+        new SpriteSheet(AssetPool.getTexture("editor/gizmos.png"),
+                24, 48, 2, 0));
+
 
         for (GameObject g : gameObjects) {
             if (g.getComponent(SpriteRenderer.class) != null) {
@@ -63,6 +73,7 @@ public class TestScene extends Scene {
     @Override
     public void update(float dt) {
         updateComponents(dt);
+
         camera.adjustProjective();
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
@@ -87,6 +98,10 @@ public class TestScene extends Scene {
 
     @Override
     public void imgui() {
+        ImGui.begin("Level Editor Stuff");
+        componentImgui();
+        ImGui.end();
+
         ImGui.begin("Test window");
 
         ImVec2 windowPos = ImGui.getWindowPos();

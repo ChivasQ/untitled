@@ -45,15 +45,13 @@ public class EditorCameraMovement extends Component {
         }
 
         if (MouseListener.getScrollY() != 0.0) {
-            float addValue = (float)Math.pow(Math.abs(MouseListener.getScrollY() * SCROLL_SENSETIVITY),
-                    1 / levelEditorCamera.getZoom());
-            addValue *= -Math.signum(MouseListener.getScrollY());
+            float addValue = MouseListener.getScrollY() * SCROLL_SENSETIVITY * -1;
 
 
             Vector2f oldCenter = levelEditorCamera.getCameraCenter();
 
-            levelEditorCamera.addZoom(addValue);
-
+            levelEditorCamera.addZoom(addValue * levelEditorCamera.getZoom());
+            //System.out.println(addValue * 1/levelEditorCamera.getZoom());
             Vector2f newCenter = levelEditorCamera.getCameraCenter();
 
             levelEditorCamera.position.add(oldCenter.sub(newCenter));

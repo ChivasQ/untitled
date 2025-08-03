@@ -57,6 +57,13 @@ public abstract class Scene {
         updateComponents(dt);
     }
 
+    public void startSceneComponents() {
+        for (Component c :
+                sceneComponents) {
+            c.start();
+        }
+    }
+
     public void updateComponents(float dt) {
         for (Component c :
                 sceneComponents) {
@@ -97,7 +104,8 @@ public abstract class Scene {
 
         try {
             FileWriter fileWriter = new FileWriter("level.txt");
-            fileWriter.write(gson.toJson(this.gameObjects));
+            List<GameObject> toSerialize = gameObjects.stream().filter(GameObject::isDoSerialization).toList();
+            fileWriter.write(gson.toJson(toSerialize));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -157,5 +165,12 @@ public abstract class Scene {
 
     public void addSceneComponent(Component component) {
         sceneComponents.add(component);
+    }
+
+    public void componentImgui() {
+        for (Component c :
+                sceneComponents) {
+            c.imgui();
+        }
     }
 }

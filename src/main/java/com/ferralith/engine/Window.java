@@ -286,6 +286,9 @@ public class Window {
         glEnable(GL_BLEND);
     }
 
+    public static ImGuiWrapper getImGuiWrapper() {
+        return getInstance().imGuiWrapper;
+    }
 
     public static int getHeight() {
         return getInstance().height;

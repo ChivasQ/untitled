@@ -66,11 +66,13 @@ public class ImGuiWrapper {
             }
         });
 
-//        glfwSetScrollCallback(glfwWindow, (window, xoffset, yoffset) -> {
-//           io.setMouseWheelH(io.getMouseWheelH() + (float) xoffset);
-//           io.setMouseWheel(io.getMouseWheel() + (float) yoffset);
-//           MouseListener.mouseScrollCallback(window, xoffset, yoffset);
-//        });
+        glfwSetScrollCallback(glfwWindow, (window, xoffset, yoffset) -> {
+            io.setMouseWheelH(io.getMouseWheelH() + (float) xoffset);
+            io.setMouseWheel(io.getMouseWheel() + (float) yoffset);
+            if (gameViewWindow.isHoveringViewport() && (!io.getWantCaptureMouse() || gameViewWindow.getWantCaptureMouse())) {
+                MouseListener.mouseScrollCallback(window, xoffset, yoffset);
+            }
+        });
 
         io.getFonts().setFreeTypeRenderer(true);
 
@@ -145,7 +147,9 @@ public class ImGuiWrapper {
         //renderBuffer();
     }
 
-
+    public PropertiesWindow getPropertiesWindow() {
+        return propertiesWindow;
+    }
 
     protected void disposeImGui() {
         ImGui.destroyContext();

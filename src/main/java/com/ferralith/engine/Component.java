@@ -1,6 +1,7 @@
 package com.ferralith.engine;
 
 import imgui.ImGui;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -39,11 +40,17 @@ public abstract class Component {
                     if (ImGui.dragInt(name + ": ", imInt)) {
                         field.set(this, imInt[0]);
                     }
-                } else if (type == float.class){
-                    float val = (float)value;
+                } else if (type == float.class) {
+                    float val = (float) value;
                     float[] imFloat = {val};
                     if (ImGui.dragFloat(name + ": ", imFloat)) {
                         field.set(this, imFloat[0]);
+                    }
+                } else if (type == Vector2f.class) {
+                    Vector2f val = (Vector2f)value;
+                    float[] imVec2f = {val.x, val.y};
+                    if (ImGui.dragFloat2(name + ": ", imVec2f)) {
+                        val.set(imVec2f[0], imVec2f[1]);
                     }
                 } else if (type == Vector3f.class) {
                     Vector3f val = (Vector3f)value;
@@ -62,7 +69,7 @@ public abstract class Component {
                 if (isPrivate) field.setAccessible(false);
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
