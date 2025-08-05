@@ -10,13 +10,14 @@ public class GameObject {
 
     public String name;
     private List<Component> components;
+    private List<Tags> tags;
     public Transform transform;
     private int zIndex;
-    private boolean doSerialization = true;
 
     public GameObject(String name) {
         this.name = name;
         this.components = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.transform = new Transform();
         this.zIndex = 0;
 
@@ -26,6 +27,7 @@ public class GameObject {
     public GameObject(String name, Transform transform, int zIndex) {
         this.name = name;
         this.components = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.transform = transform;
         this.zIndex = zIndex;
 
@@ -35,6 +37,7 @@ public class GameObject {
     public GameObject(String name, Transform transform) {
         this.name = name;
         this.components = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.transform = transform;
         this.zIndex = 0;
 
@@ -95,6 +98,17 @@ public class GameObject {
         }
     }
 
+    public boolean hasTag(Tags tag) {
+        for (Tags i: tags) {
+            if (tag == i) return true;
+        }
+        return false;
+    }
+
+    public void addTag(Tags tag) {
+        this.tags.add(tag);
+    }
+
     public int getUid() {
         return this.uid;
     }
@@ -105,17 +119,5 @@ public class GameObject {
 
     public List<Component> getAllComponents() {
         return this.components;
-    }
-
-    public boolean isDoSerialization() {
-        return doSerialization;
-    }
-
-    public void setDoSerialization(boolean doSerialization) {
-        this.doSerialization = doSerialization;
-    }
-
-    public void setNoSerialize() {
-        setDoSerialization(false);
     }
 }

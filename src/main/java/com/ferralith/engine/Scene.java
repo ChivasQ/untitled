@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 public abstract class Scene {
 
     protected Renderer renderer = new Renderer();
@@ -104,7 +106,7 @@ public abstract class Scene {
 
         try {
             FileWriter fileWriter = new FileWriter("level.txt");
-            List<GameObject> toSerialize = gameObjects.stream().filter(GameObject::isDoSerialization).toList();
+            List<GameObject> toSerialize = gameObjects.stream().filter(gameObject -> !gameObject.hasTag(Tags.doNotSerialize)).toList();
             fileWriter.write(gson.toJson(toSerialize));
             fileWriter.close();
         } catch (IOException e) {

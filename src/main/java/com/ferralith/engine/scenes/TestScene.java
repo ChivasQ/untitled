@@ -4,12 +4,9 @@ import com.ferralith.engine.*;
 import com.ferralith.engine.components.*;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.renderer.DebugDraw;
-import com.ferralith.engine.scenes.components.EditorCameraMovement;
-import com.ferralith.engine.scenes.components.Gizmo;
-import com.ferralith.engine.scenes.components.GridLines;
+import com.ferralith.engine.scenes.components.*;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.GenObject;
-import com.ferralith.engine.scenes.components.MouseControls;
 import imgui.ImGui;
 import imgui.ImVec2;
 import org.joml.Vector2f;
@@ -37,7 +34,7 @@ public class TestScene extends Scene {
         addSceneComponent(new MouseControls());
         addSceneComponent(new GridLines());
         addSceneComponent(new EditorCameraMovement(camera));
-        addSceneComponent(new Gizmo(gizmos.getSprite(1), Window.getImGuiWrapper().getPropertiesWindow()));
+        addSceneComponent(new TranslateGizmo(gizmos.getSprite(1), gizmos.getSprite(0), Window.getImGuiWrapper().getPropertiesWindow()));
 
         startSceneComponents();
 

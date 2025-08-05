@@ -53,6 +53,8 @@ public class MouseListener {
         get().yPos = y;
 
         calcWorldCoords();
+
+
     }
 
     public static void mouseButtonCallback(long window, int button, int action, int mods) {
@@ -79,6 +81,9 @@ public class MouseListener {
 
         get().xOld = get().xPos;
         get().yOld = get().yPos;
+
+        get().oldWorldX = get().worldX;
+        get().oldWorldY = get().worldY;
     }
 
     public static float getX() {
@@ -168,5 +173,37 @@ public class MouseListener {
 
     public void setGameViewportSize(Vector2f gameViewportSize) {
         this.gameViewportSize.set(gameViewportSize);
+    }
+
+    public double getxPos() {
+        return xPos;
+    }
+
+    public double getyPos() {
+        return yPos;
+    }
+
+    public static double getxOld() {
+        return get().xOld;
+    }
+
+    public static double getyOld() {
+        return get().yOld;
+    }
+
+    public double getWorldX() {
+        return worldX;
+    }
+
+    public double getWorldY() {
+        return worldY;
+    }
+
+    public double getOldWorldX() {
+        return oldWorldX;
+    }
+
+    public double getOldWorldY() {
+        return oldWorldY;
     }
 }

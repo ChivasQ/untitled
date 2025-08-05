@@ -2,6 +2,7 @@ package com.ferralith.engine.scenes.editor;
 
 import com.ferralith.engine.GameObject;
 import com.ferralith.engine.Scene;
+import com.ferralith.engine.Tags;
 import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.renderer.PickingTexture;
 import imgui.ImGui;
@@ -12,7 +13,7 @@ public class PropertiesWindow {
     protected GameObject activeGameObject = null;
     private PickingTexture pickingTexture;
 
-    private float debounce = 0.2f;
+    private float debounce = 0.02f;
 
     public PropertiesWindow(PickingTexture texture) {
         this.pickingTexture = texture;
@@ -24,8 +25,14 @@ public class PropertiesWindow {
         if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && debounce < 0) {
             int x = (int) MouseListener.getScreenX();
             int y = (int) MouseListener.getScreenY();
-            activeGameObject = currentCcene.getGameObject(pickingTexture.readPixel(x, y));
-            this.debounce = 0.2f;
+            GameObject tmp = currentCcene.getGameObject(pickingTexture.readPixel(x, y));
+            if (tmp != null && !tmp.hasTag(Tags.nonPickable)) {
+                activeGameObject = tmp;
+            } else if (tmp == null && !MouseListener.isDragging()) {
+                activeGameObject = null;
+            }
+
+            this.debounce = 0.02f;
         }
 
     }

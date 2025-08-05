@@ -10,6 +10,7 @@ import com.ferralith.engine.utils.Time;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
 import imgui.internal.ImGuiWindow;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
@@ -27,6 +28,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class Window {
+    private long resizeCursor;
+
     private int width;
     private int height;
     private String title;
@@ -134,6 +137,8 @@ public class Window {
 
         if ( !glfwInit() )
             throw new IllegalStateException("Unable to initialize GLFW");
+        // todo: tomorrow
+        resizeCursor = GLFW.glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
 
         // Configure GLFW
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
@@ -181,12 +186,11 @@ public class Window {
             }
         });
 
+
 //        glfwSetFramebufferSizeCallback(glfwWindow, (window, width, height) -> {
 //            glViewport(0, 0, width, height);
 //            isResized = true;
 //        });
-
-
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
@@ -198,6 +202,14 @@ public class Window {
 
         GL.createCapabilities();
 
+
+//        glfwSetCursorEnterCallback(glfwWindow, ((window1, entered) -> {
+//            if (entered) {
+//                GLFW.glfwSetCursor(glfwWindow, resizeCursor);
+//            }
+//        }));
+
+        GLFW.glfwSetCursor(glfwWindow, resizeCursor);
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -206,6 +218,7 @@ public class Window {
 
         this.imGuiWrapper = new ImGuiWrapper(glfwWindow, pickingTexture);
         this.imGuiWrapper.initImGui();
+
 
         Window.changeScene(1);
     }
@@ -243,7 +256,6 @@ public class Window {
 
         glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
         if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             System.out.println("orthoX: " + (int)MouseListener.getOrthoX() + " OrthoY: " + (int)MouseListener.getOrthoY());
         }
