@@ -44,8 +44,8 @@ public class Window {
     private Shader defaultShader;
 
     public Window(){
-        this.height =  100;
-        this.width =  100;
+        this.height =  0;
+        this.width =  0;
         this.title =  "title";
         this.r = 1f;
         this.g = 0.2f;
@@ -87,7 +87,11 @@ public class Window {
     }
 
     public static float getTargetAspectRatio() {
-        return 16.0f / 9.0f;
+        return (float) getWidth() / getHeight();
+    }
+
+    public static void resizeFrameBuffer(int x, int y) {
+        //getInstance().framebuffer = new Framebuffer(x, y);
     }
 
 
@@ -240,7 +244,9 @@ public class Window {
         glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
+        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+            System.out.println("orthoX: " + (int)MouseListener.getOrthoX() + " OrthoY: " + (int)MouseListener.getOrthoY());
+        }
 
         if (dt >= 0) {
             Renderer.bindShader(defaultShader);

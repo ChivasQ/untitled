@@ -46,4 +46,8 @@ public class Framebuffer {
     public int getTextureID() {
         return texture.getId();
     }
+
+    public Framebuffer resize(int x, int y) {
+        return new Framebuffer(x, y);
+    }
 }
