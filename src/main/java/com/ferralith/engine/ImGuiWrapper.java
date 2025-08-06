@@ -44,7 +44,7 @@ public class ImGuiWrapper {
 
         io.setIniFilename("imgui.ini");
         io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
-        io.addConfigFlags(ImGuiConfigFlags.NoMouseCursorChange); // todo: somehow manage to fix it.
+        //io.addConfigFlags(ImGuiConfigFlags.NoMouseCursorChange); // todo: somehow manage to fix it.
 
         glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {
             final boolean[] mouseDown = new boolean[5];

@@ -86,15 +86,15 @@ public class Gizmo extends Component {
         boolean xyAxisHot = checkXYHoverState();
         //System.out.println(xAxisHot + " " + yAxisHot + " "+ xyAxisHot);
 
-        if ((xAxisHot || xAxisActive) && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+        if ((xAxisHot || xAxisActive) && !yAxisActive && !xyAxisActive && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             xAxisActive = true;
             yAxisActive = false;
             xyAxisActive = false;
-        } else if ((yAxisHot || yAxisActive) && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+        } else if ((yAxisHot || yAxisActive) && !xAxisActive && !xyAxisActive &&  MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             xAxisActive = false;
             yAxisActive = true;
             xyAxisActive = false;
-        } else if ((xyAxisHot || xyAxisActive) && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+        } else if ((xyAxisHot || xyAxisActive)  && !yAxisActive && !xAxisActive && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             xAxisActive = false;
             yAxisActive = false;
             xyAxisActive = true;
@@ -139,7 +139,6 @@ public class Gizmo extends Component {
                 mousePos.y >= xAxisObject.transform.position.y &&
                 mousePos.y <= xAxisObject.transform.position.y + gizmoArrowWidth) {
             xAxisSpriteRenderer.setColor(xAxisColorHover);
-            System.out.println("hi");
             return true;
         }
 
