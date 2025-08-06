@@ -1,5 +1,7 @@
 package com.ferralith.engine;
 
+import imgui.ImGui;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,14 +14,12 @@ public class GameObject {
     private List<Component> components;
     private List<Tags> tags;
     public Transform transform;
-    private int zIndex;
 
     public GameObject(String name) {
         this.name = name;
         this.components = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.transform = new Transform();
-        this.zIndex = 0;
 
         this.uid = ID_COUNTER++;
     }
@@ -29,8 +29,7 @@ public class GameObject {
         this.components = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.transform = transform;
-        this.zIndex = zIndex;
-
+        this.transform.zIndex = zIndex;
         this.uid = ID_COUNTER++;
     }
 
@@ -39,7 +38,6 @@ public class GameObject {
         this.components = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.transform = transform;
-        this.zIndex = 0;
 
         this.uid = ID_COUNTER++;
     }
@@ -85,16 +83,20 @@ public class GameObject {
     }
 
     public int getzIndex() {
-        return zIndex;
+        return this.transform.zIndex;
     }
 
     public void setzIndex(int zIndex) {
-        this.zIndex = zIndex;
+        this.transform.zIndex = zIndex;
     }
 
     public void imgui() {
+        if (ImGui.collapsingHeader(transform.getClass().getSimpleName()))
+            transform.imgui();
+
         for (Component c : components) {
-            c.imgui();
+            if (ImGui.collapsingHeader(c.getClass().getSimpleName()))
+                c.imgui();
         }
     }
 

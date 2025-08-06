@@ -170,8 +170,7 @@ public abstract class Scene {
     }
 
     public void componentImgui() {
-        for (Component c :
-                sceneComponents) {
+        for (Component c : sceneComponents) {
             c.imgui();
         }
     }

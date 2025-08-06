@@ -3,6 +3,7 @@ package com.ferralith.engine.components;
 import com.ferralith.engine.Component;
 import com.ferralith.engine.Transform;
 import com.ferralith.engine.renderer.Texture;
+import com.ferralith.engine.utils.MyImGui;
 import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -90,11 +91,8 @@ public class SpriteRenderer extends Component {
 
     @Override
     public void imgui() {
-        float[] imColor = {color.x, color.y, color.z, color.w};
-        if (ImGui.colorPicker4("Color Picker: ", imColor)) {
-            //System.out.println("COLOR CHANGED");
-            this.color.set(imColor[0], imColor[1], imColor[2], imColor[3]);
-            this.setDirty();
+        if (MyImGui.colorPicker4("Color picker", this.color)) {
+            setDirty();
         }
     }
 

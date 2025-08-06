@@ -1,5 +1,6 @@
 package com.ferralith.engine;
 
+import com.ferralith.engine.utils.MyImGui;
 import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -48,10 +49,7 @@ public abstract class Component {
                     }
                 } else if (type == Vector2f.class) {
                     Vector2f val = (Vector2f)value;
-                    float[] imVec2f = {val.x, val.y};
-                    if (ImGui.dragFloat2(name + ": ", imVec2f)) {
-                        val.set(imVec2f[0], imVec2f[1]);
-                    }
+                    MyImGui.drawVec2Control(name, val);
                 } else if (type == Vector3f.class) {
                     Vector3f val = (Vector3f)value;
                     float[] imVec3f = {val.x, val.y, val.z};

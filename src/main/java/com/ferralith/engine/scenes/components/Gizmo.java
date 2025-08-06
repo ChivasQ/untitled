@@ -69,6 +69,11 @@ public class Gizmo extends Component {
     public void start() {
         this.xAxisObject.transform.rotation = 90;
         this.yAxisObject.transform.rotation = 180;
+
+        // why not
+        this.xAxisObject.transform.zIndex = Integer.MAX_VALUE;
+        this.yAxisObject.transform.zIndex = Integer.MAX_VALUE;
+        this.xyAxisObject.transform.zIndex = Integer.MAX_VALUE;
     }
 
     @Override

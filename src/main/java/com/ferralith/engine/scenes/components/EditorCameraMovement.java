@@ -4,6 +4,8 @@ import com.ferralith.engine.Camera;
 import com.ferralith.engine.Component;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
+import imgui.ImGui;
+import imgui.flag.ImGuiMouseCursor;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -17,7 +19,7 @@ public class EditorCameraMovement extends Component {
     private boolean reset = false;
     private float lerpTime = 0.0f;
 
-    private float dragDebounce = 0.01f;
+    private float dragDebounce = 0.02f;
 
     public EditorCameraMovement(Camera camera) {
         this.levelEditorCamera = camera;
@@ -27,12 +29,14 @@ public class EditorCameraMovement extends Component {
 
     @Override
     public void update(float dt) {
+        //todo: fix camera movement
         if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE) && dragDebounce > 0) {
             this.clickOrigin = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
             dragDebounce -= dt;
             return;
         } else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
             Vector2f mousePos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
+
             Vector2f delta = new Vector2f(mousePos).sub(this.clickOrigin);
 
             levelEditorCamera.position.sub(delta.mul(dt).mul(SENSITIVITY));
@@ -41,7 +45,7 @@ public class EditorCameraMovement extends Component {
         }
 
         if (dragDebounce <= 0.0f && !MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
-            dragDebounce = 0.01f;
+            dragDebounce = 0.02f;
         }
 
         if (MouseListener.getScrollY() != 0.0) {

@@ -175,14 +175,6 @@ public class MouseListener {
         this.gameViewportSize.set(gameViewportSize);
     }
 
-    public double getxPos() {
-        return xPos;
-    }
-
-    public double getyPos() {
-        return yPos;
-    }
-
     public static double getxOld() {
         return get().xOld;
     }
@@ -191,19 +183,11 @@ public class MouseListener {
         return get().yOld;
     }
 
-    public double getWorldX() {
-        return worldX;
+    public static double getOldWorldX() {
+        return get().oldWorldX;
     }
 
-    public double getWorldY() {
-        return worldY;
-    }
-
-    public double getOldWorldX() {
-        return oldWorldX;
-    }
-
-    public double getOldWorldY() {
-        return oldWorldY;
+    public static double getOldWorldY() {
+        return get().oldWorldY;
     }
 }

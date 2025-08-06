@@ -15,4 +15,12 @@ public class GenObject {
         object.addComponent(spriteRenderer);
         return object;
     }
+
+    public static GameObject generateSpriteObject(Sprite sprite, float sizeX, float sizeY, int Zindex) {
+        GameObject object = new GameObject("Sprite_object_gen",
+                new Transform(new Vector2f(), new Vector2f(sizeX, sizeY)), Zindex);
+        SpriteRenderer spriteRenderer = new SpriteRenderer(sprite);
+        object.addComponent(spriteRenderer);
+        return object;
+    }
 }
