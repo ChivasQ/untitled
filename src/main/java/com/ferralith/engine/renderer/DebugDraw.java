@@ -178,4 +178,8 @@ public class DebugDraw {
     public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime) {
         addPolygon(center,radius, color, lifetime, 16);
     }
+
+    public static void clear() {
+        lines.clear();
+    }
 }

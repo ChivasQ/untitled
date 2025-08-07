@@ -1,45 +1,245 @@
 package com.ferralith.engine.scenes;
 
-import com.ferralith.engine.Camera;
-import com.ferralith.engine.Scene;
-import com.ferralith.engine.Window;
+import com.ferralith.engine.*;
+import com.ferralith.engine.components.Sprite;
+import com.ferralith.engine.components.SpriteRenderer;
+import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.inputs.KeyListener;
+import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.renderer.DebugDraw;
+import com.ferralith.engine.renderer.Texture;
+import com.ferralith.engine.scenes.components.EditorCameraMovement;
+import com.ferralith.engine.scenes.components.GridLines;
+import com.ferralith.engine.scenes.components.MouseControls;
+import com.ferralith.engine.scenes.components.TranslateGizmo;
+import com.ferralith.engine.utils.AssetPool;
+import com.ferralith.game.models.Pixel;
+import com.ferralith.game.models.PixelType;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.awt.event.KeyEvent;
-import java.nio.IntBuffer;
-import java.security.Key;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
-import static org.lwjgl.opengl.GL42.GL_MAX_IMAGE_UNITS;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import static org.lwjgl.opengl.GL11.glLineWidth;
 
 public class LevelScene extends Scene {
+    private final int width = 512;
+    private final int height = 512;
+    private final Pixel[][] pixels = new Pixel[width][height];
+    private final List<Pixel> dirty_pixels = new ArrayList<>();
+    private final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 4);
+    private final Texture texture = new Texture(width, height, 0);
+    private Random rand;
+    private GameObject go;
+
     public LevelScene() {
         System.out.println("LEVEL SCENE");
+        this.camera = new Camera(new Vector2f(0, 0));
+    }
+
+    public LevelScene(Camera camera) {
+        this.camera = camera;
+    }
+
+    @NotNull
+    private static Pixel newAirPixel() {
+        return new Pixel(0x00000000, PixelType.Air);
     }
 
     @Override
     public void init() {
-        this.camera = new Camera(new Vector2f(-0,-0));
+        loadResources();
+        addSceneComponent(new MouseControls());
+        addSceneComponent(new GridLines());
+        addSceneComponent(new EditorCameraMovement(camera));
+        SpriteSheet gizmos = AssetPool.getSpritesheet("editor/gizmos.png");
+        addSceneComponent(new TranslateGizmo(gizmos.getSprite(1), gizmos.getSprite(0), Window.getImGuiWrapper().getPropertiesWindow()));
+
+        startSceneComponents();
+
+        go = new GameObject("gen");
+        go.addComponent(new SpriteRenderer(new Sprite(texture)));
+        go.addTag(Tags.doNotSerialize);
+        go.transform.scale = new Vector2f(1024, 1024);
+        addGameObject(go);
+
+
+        if (loadedLevel) {
+            return;
+        }
+        rand = new Random();
+        for (int i = 0; i < pixels.length; i++) {
+            for (int j = 0; j < pixels[0].length; j++) {
+                if (false) {
+                    pixels[i][j] = newSandPixel();
+                } else {
+                    pixels[i][j] = newAirPixel();
+                }
+            }
+        }
+    }
+
+    private Pixel newSandPixel() {
+        return new Pixel(0xFFFFFFFF, PixelType.Sand).setColor(
+                new Vector4f(0.96f, 0.84f, 0.69f, 1)
+                        .mul(new Vector4f((float) Math.max(rand.nextFloat(0.6f, 1), 0.3))));
     }
 
     @Override
     public void update(float dt) {
-        IntBuffer a = BufferUtils.createIntBuffer(1);
-        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, a);
-        System.out.println(a.get(0));
+        updateComponents(dt);
+        camera.adjustProjective();
+
+        texture.bind();
+
+        buffer.clear();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int color = pixels[x][y].getColor();
+
+                byte r = (byte) ((color >> 16) & 0xFF);
+                byte g = (byte) ((color >> 8) & 0xFF);
+                byte b = (byte) (color & 0xFF);
+                byte a = (byte) ((color >> 24) & 0xFF);
+
+                buffer.put(r).put(g).put(b).put(a);
+            }
+        }
+        buffer.flip();
+
+        texture.update(buffer);
+        texture.unbind();
+
+        Vector2f pos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
+        Transform go_t = go.transform;
+        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
+                    pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
+                DebugDraw.addBox2D(pos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
+                for (int i = 0; i < 50; i++) {
+                    for (int j = 0; j < 50; j++) {
+                        int x = (int) (pos.x / 2 + i - 25);
+                        int y = (int) (pos.y / 2 + j - 25);
+                        if (inBounds(x, y)) {
+                            pixels[x][y] = newSandPixel();
+                        }
+                    }
+                }
+            }
+        } else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+            if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
+                    pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
+                DebugDraw.addBox2D(pos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
+                for (int i = 0; i < 50; i++) {
+                    for (int j = 0; j < 50; j++) {
+                        int x = (int) (pos.x / 2 + i - 25);
+                        int y = (int) (pos.y / 2 + j - 25);
+                        if (inBounds(x, y)) {
+                            pixels[x][y] = newAirPixel();
+                        }
+                    }
+                }
+            }
+        }
 
 
-        if (KeyListener.isKeyPressed(KeyEvent.VK_2)) {
-            Window.changeScene(1);
+        updateCells(dt);
+
+        glLineWidth(2);
+        DebugDraw.addBox2D(new Vector2f(512, 512), new Vector2f(1024, 1024), 0, new Vector3f(1, 0, 0), 1);
+
+        for (GameObject go : this.gameObjects) {
+            go.update(dt);
+        }
+
+        if (KeyListener.isKeyPressed(KeyEvent.VK_R)) {
+            Window.changeScene(0, camera);
+        }
+    }
+
+    public void updateCells(float dt) {
+        for (int y = height - 1; y >= 0; y--) {
+            for (int x = 0; x < width; x++) {
+                Pixel cell = pixels[x][y];
+                if (cell == null || cell.updated) continue;
+
+                switch (cell.type) {
+                    case Sand:
+                        tryFall(x, y, 0, - 1);
+                        break;
+                    case Water:
+                        tryFlow(x, y);
+                        break;
+                }
+
+                cell.updated = true;
+            }
+        }
+
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+                pixels[x][y].updated = false;
+    }
+
+    private void tryFlow(int x, int y) {
+
+    }
+
+    private void tryFall(int x, int y, int dx, int dy) {
+        if (inBounds(x + dx, y + dy) && pixels[x + dx][y + dy].type == PixelType.Air) {
+            swap(x, y, x + dx, y + dy);
+        } else if (inBounds(x - 1, y + dy) && pixels[x - 1][y + dy].type == PixelType.Air) {
+            swap(x, y, x - 1, y + dy);
+        } else if (inBounds(x + 1, y + dy) && pixels[x + 1][y + dy].type == PixelType.Air) {
+            swap(x, y, x + 1, y + dy);
+        }
+    }
+
+    private void swap(int x0, int y0, int x1, int y1) {
+        if (! inBounds(x0, y0) || ! inBounds(x1, y1)) return;
+        Pixel tmp = pixels[x0][y0];
+        pixels[x0][y0] = pixels[x1][y1];
+        pixels[x1][y1] = tmp;
+    }
+
+
+    private boolean inBounds(int x, int y) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    private void loadResources() {
+        AssetPool.getShader("default");
+
+        // TODO: FIX THIS SHIT
+        AssetPool.addSpriteSheet("spritesheets/cat1.png",
+                new SpriteSheet(AssetPool.getTexture("spritesheets/cat1.png"),
+                        131, 240, 50, 0));
+        AssetPool.addSpriteSheet("editor/gizmos.png",
+                new SpriteSheet(AssetPool.getTexture("editor/gizmos.png"),
+                        24, 48, 2, 0));
+
+
+        for (GameObject g : gameObjects) {
+            if (g.getComponent(SpriteRenderer.class) != null) {
+                SpriteRenderer spriteRenderer = g.getComponent(SpriteRenderer.class);
+                if (spriteRenderer.getTexture() != null) {
+                    spriteRenderer.setTexture(AssetPool.getTexture(spriteRenderer.getTexture().getPath()));
+                }
+            }
         }
     }
 
     @Override
     public void render() {
-
+        this.renderer.render();
     }
 }

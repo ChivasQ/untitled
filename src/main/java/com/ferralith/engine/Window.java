@@ -7,9 +7,7 @@ import com.ferralith.engine.scenes.LevelScene;
 import com.ferralith.engine.scenes.TestScene;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.Time;
-import imgui.ImGui;
-import imgui.ImGuiViewport;
-import imgui.internal.ImGuiWindow;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -17,15 +15,13 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
-import static java.lang.Character.getType;
-import static org.lwjgl.opengl.GL43.*;
-import static org.lwjgl.system.MemoryUtil.*;
-
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private long resizeCursor;
@@ -50,15 +46,15 @@ public class Window {
         this.height =  0;
         this.width =  0;
         this.title =  "title";
-        this.r = 1f;
-        this.g = 0.2f;
-        this.b = 1f;
+        this.r = .1f;
+        this.g = .1f;
+        this.b = .1f;
     }
 
-    public static void changeScene(int newScene) {
+    public static void changeScene(int newScene, Camera camera) {
         switch (newScene) {
             case 0:
-                currentScene = new LevelScene();
+                currentScene = new LevelScene(camera);
                 currentScene.init();
                 currentScene.start();
                 break;
@@ -195,7 +191,7 @@ public class Window {
         // Make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
         // Enable v-sync
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
 
         // Make the window visible
         glfwShowWindow(glfwWindow);
@@ -219,8 +215,8 @@ public class Window {
         this.imGuiWrapper = new ImGuiWrapper(glfwWindow, pickingTexture);
         this.imGuiWrapper.initImGui();
 
-
-        Window.changeScene(1);
+        Camera camera = new Camera(new Vector2f(0,0));
+        Window.changeScene(0, camera);
     }
 
     private void loop() {
@@ -256,20 +252,28 @@ public class Window {
 
         glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
-            System.out.println("orthoX: " + (int)MouseListener.getOrthoX() + " OrthoY: " + (int)MouseListener.getOrthoY());
-        }
+//        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+//            System.out.println("orthoX: " + (int)MouseListener.getOrthoX() + " OrthoY: " + (int)MouseListener.getOrthoY());
+//        }
+
+
+
 
         if (dt >= 0) {
             Renderer.bindShader(defaultShader);
             currentScene.update(dt);
-            currentScene.render();
             DebugDraw.draw();
+            currentScene.render();
         }
 
         this.framebuffer.unbind();
 
         this.imGuiWrapper.update(dt, currentScene);
+
+        glfwSetWindowTitle(glfwWindow, "engine | " + Math.round(1/dt));
+        
+
+
 
         glfwSwapBuffers(glfwWindow);
 
@@ -277,6 +281,10 @@ public class Window {
             glfwSetWindowShouldClose(glfwWindow, true);
         }
 
+        onResize();
+    }
+
+    private void onResize() {
         if (isResized) {
             if (width == 0 && height == 0) {
                 System.out.println("Window is minimized.");

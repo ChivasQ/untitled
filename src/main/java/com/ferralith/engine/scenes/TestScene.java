@@ -1,10 +1,18 @@
 package com.ferralith.engine.scenes;
 
-import com.ferralith.engine.*;
-import com.ferralith.engine.components.*;
+import com.ferralith.engine.Camera;
+import com.ferralith.engine.GameObject;
+import com.ferralith.engine.Scene;
+import com.ferralith.engine.Window;
+import com.ferralith.engine.components.Sprite;
+import com.ferralith.engine.components.SpriteRenderer;
+import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.renderer.DebugDraw;
-import com.ferralith.engine.scenes.components.*;
+import com.ferralith.engine.scenes.components.EditorCameraMovement;
+import com.ferralith.engine.scenes.components.GridLines;
+import com.ferralith.engine.scenes.components.MouseControls;
+import com.ferralith.engine.scenes.components.TranslateGizmo;
 import com.ferralith.engine.utils.AssetPool;
 import com.ferralith.engine.utils.GenObject;
 import imgui.ImGui;
@@ -74,7 +82,7 @@ public class TestScene extends Scene {
         camera.adjustProjective();
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_1)) {
-            Window.changeScene(0);
+            Window.changeScene(0, camera);
         }
         counter += dt * 200;
 

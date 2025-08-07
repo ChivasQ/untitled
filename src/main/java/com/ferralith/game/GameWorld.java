@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameWorld {
-    private Pixel[] pixels = new Pixel[100];
+    private Pixel[][] pixels = new Pixel[100][100];
     private List<Pixel> dirty_pixels = new ArrayList<>();
 
     private void main_temp() {

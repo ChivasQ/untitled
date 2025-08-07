@@ -1,19 +1,13 @@
 package com.ferralith.engine.renderer;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL14.GL_GENERATE_MIPMAP;
 import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
@@ -94,6 +88,27 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    }
+
+    public Texture(int width, int height, int i) {
+        this.width = width;
+        this.height = height;
+        this.path = "Generated";
+
+        texID = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texID);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
+                GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
+    }
+
+    public void update(ByteBuffer buffer) {
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     }
 
     public void bind() {
