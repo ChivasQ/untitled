@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glLineWidth;
 
 public class LevelScene extends Scene {
@@ -121,10 +120,11 @@ public class LevelScene extends Scene {
 
         Vector2f pos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
         Transform go_t = go.transform;
+        Vector2f pixelPerfectPos = new Vector2f((int)(pos.x - (pos.x % 2)), (int)(pos.y - (pos.y % 2)));
         if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
                     pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
-                DebugDraw.addBox2D(pos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
+                DebugDraw.addBox2D(pixelPerfectPos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
                 for (int i = 0; i < 50; i++) {
                     for (int j = 0; j < 50; j++) {
                         int x = (int) (pos.x / 2 + i - 25);
@@ -135,10 +135,25 @@ public class LevelScene extends Scene {
                     }
                 }
             }
+
+        }  else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
+            if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
+                    pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
+                DebugDraw.addBox2D(pixelPerfectPos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
+                for (int i = 0; i < 50; i++) {
+                    for (int j = 0; j < 50; j++) {
+                        int x = (int) (pos.x / 2 + i - 25);
+                        int y = (int) (pos.y / 2 + j - 25);
+                        if (inBounds(x, y)) {
+                            pixels[x][y] = newWaterPixel();
+                        }
+                    }
+                }
+            }
         } else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
                     pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
-                DebugDraw.addBox2D(pos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
+                DebugDraw.addBox2D(pixelPerfectPos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
                 for (int i = 0; i < 50; i++) {
                     for (int j = 0; j < 50; j++) {
                         int x = (int) (pos.x / 2 + i - 25);
@@ -166,8 +181,14 @@ public class LevelScene extends Scene {
         }
     }
 
+    private Pixel newWaterPixel() {
+        return new Pixel(0xFFFFFFFF, PixelType.Water).setColor(
+                new Vector4f(0.1f, 0.1f, 1f, 0.1f)
+                        .mul(new Vector4f((float) Math.max(rand.nextFloat(0.6f, 1), 0.3))));
+    }
+
     public void updateCells(float dt) {
-        for (int y = height - 1; y >= 0; y--) {
+        for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Pixel cell = pixels[x][y];
                 if (cell == null || cell.updated) continue;
@@ -177,7 +198,7 @@ public class LevelScene extends Scene {
                         tryFall(x, y, 0, - 1);
                         break;
                     case Water:
-                        tryFlow(x, y);
+                        tryFlow(x, y, 0, -1);
                         break;
                 }
 
@@ -190,8 +211,16 @@ public class LevelScene extends Scene {
                 pixels[x][y].updated = false;
     }
 
-    private void tryFlow(int x, int y) {
+    private void tryFlow(int x, int y, int dx, int dy) {
+        tryFall(x, y, 0, -1);
 
+        if (Math.random() > 0.5) {
+            if (inBounds(x - 1, y) && pixels[x - 1][y].type == PixelType.Air) swap(x, y, x - 1, y);
+            else if (inBounds(x + 1, y) && pixels[x + 1][y].type == PixelType.Air) swap(x, y, x + 1, y);
+        } else {
+            if (inBounds(x + 1, y) && pixels[x + 1][y].type == PixelType.Air) swap(x, y, x + 1, y);
+            else if (inBounds(x - 1, y) && pixels[x - 1][y].type == PixelType.Air) swap(x, y, x - 1, y);
+        }
     }
 
     private void tryFall(int x, int y, int dx, int dy) {
