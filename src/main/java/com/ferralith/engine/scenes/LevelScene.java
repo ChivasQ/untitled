@@ -6,7 +6,9 @@ import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.physics.AABB;
 import com.ferralith.engine.physics.Dummy;
+import com.ferralith.engine.physics.RigidBody;
 import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.renderer.Texture;
 import com.ferralith.engine.scenes.components.EditorCameraMovement;
@@ -73,8 +75,19 @@ public class LevelScene extends Scene {
         go.transform.scale = new Vector2f(1024, 1024);
         addGameObject(go);
 
-        Dummy dummy = new Dummy("test", new Transform(), 100);
+        Dummy dummy = new Dummy("test", new Transform(new Vector2f(400, 400)), 100);
+        dummy.removeComponent(RigidBody.class);
         addGameObject(dummy);
+
+
+        Dummy dummy2 = new Dummy("test", new Transform(new Vector2f(300, 100)), 100);
+        dummy2.removeComponent(RigidBody.class);
+        addGameObject(dummy2);
+
+
+        Dummy dummy1 = new Dummy("test1", new Transform(new Vector2f(50, 200)), 100);
+        dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(10,10));
+        addGameObject(dummy1);
 
         if (loadedLevel) {
             return;
@@ -166,10 +179,79 @@ public class LevelScene extends Scene {
             go.update(dt);
         }
 
+        updatePhysics(dt);
+
         if (KeyListener.isKeyPressed(KeyEvent.VK_R)) {
             Window.changeScene(0, camera);
         }
     }
+
+    private void updatePhysics(float dt) {
+        List<GameObject> list_objects = gameObjects.stream()
+                .filter(go -> go.getComponent(AABB.class) != null)
+                .toList();
+
+        for (int i = 0; i < list_objects.size(); i++) {
+            for (int j = i + 1; j < list_objects.size(); j++) {
+                AABB boxA = list_objects.get(i).getComponent(AABB.class);
+                AABB boxB = list_objects.get(j).getComponent(AABB.class);
+
+                if (boxA.intersects(boxB)) {
+                    boxA.setColor(1,0,0);
+                    boxB.setColor(1,0,0);
+
+                    resolveCollision(list_objects.get(i), list_objects.get(j));
+                } else {
+                    boxB.setColor(1,1,1);
+                    boxA.setColor(1,1,1);
+                }
+            }
+        }
+    }
+
+    private void resolveCollision(GameObject a, GameObject b) {
+        AABB boxA = a.getComponent(AABB.class);
+        AABB boxB = b.getComponent(AABB.class);
+        RigidBody bodyA = a.getComponent(RigidBody.class);
+        RigidBody bodyB = b.getComponent(RigidBody.class);
+
+        Vector2f aMin = boxA.getMinPos();
+        Vector2f aMax = boxA.getMaxPos();
+        Vector2f bMin = boxB.getMinPos();
+        Vector2f bMax = boxB.getMaxPos();
+
+        // overlap X & Y
+        float overlapX = Math.min(aMax.x, bMax.x) - Math.max(aMin.x, bMin.x); // calculating overlapping parts on both axis
+        float overlapY = Math.min(aMax.y, bMax.y) - Math.max(aMin.y, bMin.y);
+
+        // by what axis do move obj (which one that has less overlapped parts)
+        if (overlapX < overlapY) {
+            // move by x
+            if (a.transform.position.x < b.transform.position.x) {
+                a.transform.position.x -= overlapX / 2; // divide by 2 because there is 2 object to collide
+                b.transform.position.x += overlapX / 2;
+            } else {
+                a.transform.position.x += overlapX / 2;
+                b.transform.position.x -= overlapX / 2;
+            }
+            // reduce speed x-axis
+            if (bodyA != null) bodyA.velocity.x = 0;
+            if (bodyB != null) bodyB.velocity.x = 0;
+        } else {
+            // move by y
+            if (a.transform.position.y < b.transform.position.y) {
+                a.transform.position.y -= overlapY / 2;
+                b.transform.position.y += overlapY / 2;
+            } else {
+                a.transform.position.y += overlapY / 2;
+                b.transform.position.y -= overlapY / 2;
+            }
+            // reduce speed y-axis
+            if (bodyA != null) bodyA.velocity.y = 0;
+            if (bodyB != null) bodyB.velocity.y = 0;
+        }
+    }
+
 
     private Pixel newWaterPixel() {
         return new Pixel(0xFFFFFFFF, PixelType.Water).setColor(

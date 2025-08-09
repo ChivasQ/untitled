@@ -9,7 +9,7 @@ public class RigidBody extends Component {
     private int colliderType = 0;
     private float friction = 0.1f;
     private float mass = 10.0f;
-    public Vector2f velocity = new Vector2f(-10, 10);
+    public Vector2f velocity = new Vector2f(0, 0);
 
     @Override
     public void update(float dt) {
@@ -22,7 +22,7 @@ public class RigidBody extends Component {
     }
 
     public void applyForce(Vector2f force) {
-        Vector2f acceleration = new Vector2f(force).div(mass);
-        this.velocity.add(acceleration);
+       // Vector2f acceleration = new Vector2f(force).div(mass);
+        this.velocity.add(force);
     }
 }
