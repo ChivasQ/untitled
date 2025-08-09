@@ -6,6 +6,7 @@ import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.components.SpriteSheet;
 import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
+import com.ferralith.engine.physics.Dummy;
 import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.renderer.Texture;
 import com.ferralith.engine.scenes.components.EditorCameraMovement;
@@ -27,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 import static org.lwjgl.opengl.GL11.glLineWidth;
 
 public class LevelScene extends Scene {
@@ -71,6 +73,8 @@ public class LevelScene extends Scene {
         go.transform.scale = new Vector2f(1024, 1024);
         addGameObject(go);
 
+        Dummy dummy = new Dummy("test", new Transform(), 100);
+        addGameObject(dummy);
 
         if (loadedLevel) {
             return;
@@ -136,20 +140,6 @@ public class LevelScene extends Scene {
                 }
             }
 
-        }  else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
-            if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
-                    pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
-                DebugDraw.addBox2D(pixelPerfectPos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
-                for (int i = 0; i < 50; i++) {
-                    for (int j = 0; j < 50; j++) {
-                        int x = (int) (pos.x / 2 + i - 25);
-                        int y = (int) (pos.y / 2 + j - 25);
-                        if (inBounds(x, y)) {
-                            pixels[x][y] = newWaterPixel();
-                        }
-                    }
-                }
-            }
         } else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
                     pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
