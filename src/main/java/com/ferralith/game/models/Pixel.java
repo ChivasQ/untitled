@@ -20,4 +20,8 @@ public class Pixel {
     public int getColor() {
         return this.color;
     }
+
+    public PixelType getType() {
+        return type;
+    }
 }

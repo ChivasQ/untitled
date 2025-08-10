@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class DebugDraw {
-    private static int MAX_LINES = 1000;
+    private static int MAX_LINES = 5000;
 
     public static List<Line2D> lines = new ArrayList<>();
 
@@ -173,6 +173,19 @@ public class DebugDraw {
             currentAngle += increment;
         }
         addLine2D(points[0], points[vectices - 1]);
+    }
+
+    public static void addPolygonn(List<Vector2f> vertices, float scale) {
+        if (vertices == null) return;
+        if (vertices.isEmpty()) return;
+        System.out.println(vertices.size());
+        for (int i = 0; i < vertices.size(); i++) {
+            if (i > 0) {
+                //System.out.println(points[i - 1].toString());
+                addLine2D(vertices.get(i - 1).mul(scale), vertices.get(i).mul(scale), new Vector3f(0,1,0), 1);
+            }
+        }
+        addLine2D(vertices.get(0).mul(scale), vertices.get(vertices.size() - 1).mul(scale));
     }
 
     public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime) {

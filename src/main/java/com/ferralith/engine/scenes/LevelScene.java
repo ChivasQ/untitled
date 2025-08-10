@@ -16,6 +16,7 @@ import com.ferralith.engine.scenes.components.GridLines;
 import com.ferralith.engine.scenes.components.MouseControls;
 import com.ferralith.engine.scenes.components.TranslateGizmo;
 import com.ferralith.engine.utils.AssetPool;
+import com.ferralith.engine.utils.Mth;
 import com.ferralith.game.models.Pixel;
 import com.ferralith.game.models.PixelType;
 import org.jetbrains.annotations.NotNull;
@@ -114,14 +115,14 @@ public class LevelScene extends Scene {
     public void update(float dt) {
         updateComponents(dt);
         camera.adjustProjective();
-
+        boolean[][] tmp = new boolean[width][height];
         texture.bind();
 
         buffer.clear();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int color = pixels[x][y].getColor();
-
+                tmp[y][x] = pixels[x][y].getType() != PixelType.Air;
                 byte r = (byte) ((color >> 16) & 0xFF);
                 byte g = (byte) ((color >> 8) & 0xFF);
                 byte b = (byte) (color & 0xFF);
@@ -134,6 +135,16 @@ public class LevelScene extends Scene {
 
         texture.update(buffer);
         texture.unbind();
+
+
+
+        List<Vector2f> polygons = Mth.marchingSquares(tmp);
+        //System.out.println(polygons);
+        DebugDraw.addPolygonn(polygons, 2f);
+
+
+
+
 
         Vector2f pos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
         Transform go_t = go.transform;
@@ -183,6 +194,7 @@ public class LevelScene extends Scene {
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_R)) {
             Window.changeScene(0, camera);
+            DebugDraw.clear();
         }
     }
 
@@ -227,6 +239,7 @@ public class LevelScene extends Scene {
         // by what axis do move obj (which one that has less overlapped parts)
         if (overlapX < overlapY) {
             // move by x
+            // todo: add check if there is rigidbody, if not, only affect object with rb
             if (a.transform.position.x < b.transform.position.x) {
                 a.transform.position.x -= overlapX / 2; // divide by 2 because there is 2 object to collide
                 b.transform.position.x += overlapX / 2;
