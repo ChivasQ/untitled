@@ -106,7 +106,7 @@ public class LevelScene extends Scene {
     }
 
     private Pixel newSandPixel() {
-        return new Pixel(0xFFFFFFFF, PixelType.Sand).setColor(
+        return new Pixel(0xFFFFFFFF, PixelType.Stone).setColor(
                 new Vector4f(0.96f, 0.84f, 0.69f, 1)
                         .mul(new Vector4f((float) Math.max(rand.nextFloat(0.6f, 1), 0.3))));
     }
@@ -138,9 +138,13 @@ public class LevelScene extends Scene {
 
 
 
-        List<Vector2f> polygons = Mth.marchingSquares(tmp);
+        List<Vector2f> polygons = Mth.DouglasPeucker( Mth.marchingSquares(tmp), 10);
+
         //System.out.println(polygons);
-        DebugDraw.addPolygonn(polygons, 2f);
+        if (!polygons.isEmpty()) {
+            DebugDraw.addPolygonn(polygons, 2f);
+        }
+
 
 
 
@@ -190,7 +194,7 @@ public class LevelScene extends Scene {
             go.update(dt);
         }
 
-        updatePhysics(dt);
+        //updatePhysics(dt);
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_R)) {
             Window.changeScene(0, camera);

@@ -54,12 +54,15 @@ public class Mth {
 
         //List<Vector2f> result = new ArrayList<>();        //  commented code is old one, it works, but traceContour needs to de done
 
-        for (int y = 0; y < pixels.length - 1; y++) {
-            for (int x = 0; x < pixels[0].length - 1; x++) {
+        for (int y = 0; y < pixels.length; y++) {
+            for (int x = 0; x < pixels[0].length; x++) {
                 int p1 = pixels[y][x]     ? 1 : 0; // top-left
-                int p2 = pixels[y][x+1]   ? 1 : 0; // top-right
-                int p3 = pixels[y+1][x+1] ? 1 : 0; // bottom-right
-                int p4 = pixels[y+1][x]   ? 1 : 0; // bottom-left
+                int p2 = 0;                         // top-right
+                if (x + 1 < pixels[0].length) p2 = pixels[y][x+1] ? 1 : 0;
+                int p3 = 0; // bottom-right
+                if (x + 1 < pixels[0].length && y + 1 < pixels.length) p3 = pixels[y+1][x+1] ? 1 : 0;
+                int p4 = 0; // bottom-left
+                if (y + 1 < pixels.length) p4 = pixels[y+1][x]   ? 1 : 0;
 
                 int code = (p1 << 3) | (p2 << 2) | (p3 << 1) | p4;
 
@@ -84,6 +87,37 @@ public class Mth {
 
 
         return traceContour(result1);
+    }
+
+    public static List<Vector2f> old_marchingSquares(boolean[][] pixels) {
+        List<Vector2f> result = new ArrayList<>();
+
+        for (int y = 0; y < pixels.length; y++) {
+            for (int x = 0; x < pixels[0].length; x++) {
+                int p1 = pixels[y][x]     ? 1 : 0; // top-left
+                int p2 = 0;                         // top-right
+                if (x + 1 < pixels[0].length) p2 = pixels[y][x+1] ? 1 : 0;
+                int p3 = 0; // bottom-right
+                if (x + 1 < pixels[0].length && y + 1 < pixels.length) p3 = pixels[y+1][x+1] ? 1 : 0;
+                int p4 = 0; // bottom-left
+                if (y + 1 < pixels.length) p4 = pixels[y+1][x]   ? 1 : 0;
+
+                int code = (p1 << 3) | (p2 << 2) | (p3 << 1) | p4;
+
+                int[] edges = MARCHING_SQUARES[code];
+                for (int edge : edges) {
+                    switch (edge) {
+                        case 1: result.add(new Vector2f(x + 0.5f, y)); break;
+                        case 2: result.add(new Vector2f(x + 1,     y + 0.5f)); break;
+                        case 3: result.add(new Vector2f(x + 0.5f, y + 1)); break;
+                        case 4: result.add(new Vector2f(x,         y + 0.5f)); break;
+                    }
+                }
+            }
+        }
+
+
+        return result;
     }
 
     private static Vector2f edgeToPoint(int edge, int x, int y) {
@@ -138,6 +172,82 @@ public class Mth {
     private static boolean isVectorEqual(Vector2f a, Vector2f b) {
         float epsilon = 0.001f;
         return Math.abs(a.x - b.x) < epsilon && Math.abs(a.y - b.y) < epsilon;
+    }
+
+    public static double angle (double x1, double y1, double x2, double y2) {
+        double xdiff = x1 - x2;
+        double ydiff = y1 - y2;
+        //double tan = xdiff / ydiff;
+        double atan = Math.atan2(ydiff, xdiff);
+        return atan;
+
+    }
+
+
+    // O(N^2)
+    public static List<Vector2f> DouglasPeucker(List<Vector2f> points, double epsilon) {
+        if (points.size() < 3) return new ArrayList<>(points);
+
+        double dmax = 0;
+        int index = 0;
+        int end = points.size();
+
+        for (int i = 1; i < end - 1; i++) {
+            double d = perpendicularDistance(points.get(i), points.get(0), points.get(end - 1));
+            if (d > dmax) {
+                index = i;
+                dmax = d;
+            }
+        }
+
+        List<Vector2f> result = new ArrayList<>();
+
+        if (dmax > epsilon) {
+            List<Vector2f> recResult1 = DouglasPeucker(points.subList(0, index + 1), epsilon);
+            List<Vector2f> recResult2 = DouglasPeucker(points.subList(index, end), epsilon);
+
+            result.addAll(recResult1);
+            // removing point duplicate
+            result.remove(result.size() - 1);
+            result.addAll(recResult2);
+        } else {
+            result.add(points.get(0));
+            result.add(points.get(end - 1));
+        }
+
+        return result;
+    }
+
+
+    private static double perpendicularDistance(Vector2f point, Vector2f line_start, Vector2f line_end) {
+        double A = point.x - line_start.x;
+        double B = point.y - line_start.y;
+        double C = line_end.x - line_start.x;
+        double D = line_end.y - line_start.y;
+
+        double dot = A * C + B * D;
+        double len_sq = C * C + D * D;
+        double param = -1;
+        if (len_sq != 0) {
+            param = dot/len_sq;
+        }
+
+        double xx, yy;
+
+        if (param < 0) {
+            xx = line_start.x;
+            yy = line_start.y;
+        } else if (param > 1) {
+            xx = line_end.x;
+            yy = line_end.y;
+        } else {
+            xx = line_start.x + param * C;
+            yy = line_start.y + param * D;
+        }
+
+        double dx = point.x - xx;
+        double dy = point.y - yy;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
 

@@ -96,7 +96,7 @@ public class DebugDraw {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        glDrawArrays(GL_LINES, 0, lines.size() * 6 * 2);
+        glDrawArrays(GL_LINES, 0, lines.size() * 2);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
@@ -178,14 +178,14 @@ public class DebugDraw {
     public static void addPolygonn(List<Vector2f> vertices, float scale) {
         if (vertices == null) return;
         if (vertices.isEmpty()) return;
-        System.out.println(vertices.size());
+
         for (int i = 0; i < vertices.size(); i++) {
             if (i > 0) {
                 //System.out.println(points[i - 1].toString());
                 addLine2D(vertices.get(i - 1).mul(scale), vertices.get(i).mul(scale), new Vector3f(0,1,0), 1);
             }
         }
-        addLine2D(vertices.get(0).mul(scale), vertices.get(vertices.size() - 1).mul(scale));
+        addLine2D(vertices.get(0).mul(scale), vertices.get(vertices.size() - 1).mul(scale), new Vector3f(0,1,0),1);
     }
 
     public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime) {
