@@ -28,6 +28,7 @@ import org.lwjgl.BufferUtils;
 import java.awt.event.KeyEvent;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -194,7 +195,7 @@ public class LevelScene extends Scene {
             go.update(dt);
         }
 
-        //updatePhysics(dt);
+        updatePhysics(dt);
 
         if (KeyListener.isKeyPressed(KeyEvent.VK_R)) {
             Window.changeScene(0, camera);
@@ -207,19 +208,37 @@ public class LevelScene extends Scene {
                 .filter(go -> go.getComponent(AABB.class) != null)
                 .toList();
 
-        for (int i = 0; i < list_objects.size(); i++) {
-            for (int j = i + 1; j < list_objects.size(); j++) {
-                AABB boxA = list_objects.get(i).getComponent(AABB.class);
-                AABB boxB = list_objects.get(j).getComponent(AABB.class);
+        sweepAndPrune(list_objects);
+    }
 
-                if (boxA.intersects(boxB)) {
-                    boxA.setColor(1,0,0);
-                    boxB.setColor(1,0,0);
+    private void sweepAndPrune(List<GameObject> objects) {
+        List<GameObject> mutableObjects = new ArrayList<>(objects);
 
-                    resolveCollision(list_objects.get(i), list_objects.get(j));
-                } else {
-                    boxB.setColor(1,1,1);
-                    boxA.setColor(1,1,1);
+        mutableObjects.sort(Comparator.comparingDouble(
+                o -> o.getComponent(AABB.class).getMinPos().x
+        ));
+
+        for (int i = 0; i < objects.size(); i++) {
+            GameObject object1 = objects.get(i);
+            AABB aabb1 = object1.getComponent(AABB.class);
+            float minX1 = aabb1.getMinPos().x;
+
+            for (int j = i + 1; j < objects.size(); j++) {
+                GameObject object2 = objects.get(j);
+                AABB aabb2 = object2.getComponent(AABB.class);
+                float maxX2 = aabb2.getMaxPos().x;
+
+                if (minX1 > maxX2) {
+                    aabb2.setColor(1,1,1);
+                    aabb1.setColor(1,1,1);
+                    break;
+                }
+
+                if (aabb1.intersects(aabb2)) {
+                    //do something
+                    aabb1.setColor(1,0,0);
+                    aabb2.setColor(1,0,0);
+                    resolveCollision(object1, object2);
                 }
             }
         }
