@@ -155,6 +155,9 @@ public class LevelScene extends Scene {
         Transform go_t = go.transform;
         Vector2f pixelPerfectPos = new Vector2f((int)(pos.x - (pos.x % 2)), (int)(pos.y - (pos.y % 2)));
         if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            Dummy dummy1 = new Dummy("test", new Transform(pixelPerfectPos), 100);
+            //dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(10,10));
+            addGameObject(dummy1);
             if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
                     pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
                 DebugDraw.addBox2D(pixelPerfectPos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
