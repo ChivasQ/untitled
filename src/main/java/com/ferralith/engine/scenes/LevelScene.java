@@ -45,6 +45,7 @@ public class LevelScene extends Scene {
     private final Texture texture = new Texture(width, height, 0);
     private Random rand;
     private GameObject go;
+    private Dummy dummy;
 
     public LevelScene() {
         System.out.println("LEVEL SCENE");
@@ -77,18 +78,21 @@ public class LevelScene extends Scene {
         go.transform.scale = new Vector2f(1024, 1024);
         addGameObject(go);
 
-        Dummy dummy = new Dummy("test", new Transform(new Vector2f(400, 400)), 100);
+        dummy = new Dummy("test", new Transform(new Vector2f(400, 400)), 100);
         dummy.removeComponent(RigidBody.class);
+        dummy.loadTexture("assets/textures/objects/tree.png");
         addGameObject(dummy);
 
 
         Dummy dummy2 = new Dummy("test", new Transform(new Vector2f(300, 100)), 100);
         dummy2.removeComponent(RigidBody.class);
+        dummy2.setBoxSize(new Vector2f(100,100));
         addGameObject(dummy2);
 
 
         Dummy dummy1 = new Dummy("test1", new Transform(new Vector2f(50, 200)), 100);
         dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(10,10));
+        dummy1.setBoxSize(new Vector2f(100,100));
         addGameObject(dummy1);
 
         if (loadedLevel) {
@@ -143,7 +147,7 @@ public class LevelScene extends Scene {
 
         //System.out.println(polygons);
         if (!polygons.isEmpty()) {
-            DebugDraw.addPolygonn(polygons, 2f);
+            DebugDraw.addPolygonn(polygons, 1.415f);
         }
 
 
@@ -155,9 +159,6 @@ public class LevelScene extends Scene {
         Transform go_t = go.transform;
         Vector2f pixelPerfectPos = new Vector2f((int)(pos.x - (pos.x % 2)), (int)(pos.y - (pos.y % 2)));
         if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            Dummy dummy1 = new Dummy("test", new Transform(pixelPerfectPos), 100);
-            //dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(10,10));
-            addGameObject(dummy1);
             if (pos.x > go_t.position.x && pos.x < go_t.position.x + width * 2 &&
                     pos.y > go_t.position.y && pos.y < go_t.position.y + height * 2) {
                 DebugDraw.addBox2D(pixelPerfectPos, new Vector2f(100, 100), 0, new Vector3f(1), 1);
@@ -204,6 +205,9 @@ public class LevelScene extends Scene {
             Window.changeScene(0, camera);
             DebugDraw.clear();
         }
+
+
+        dummy.transform.rotation++;
     }
 
     private void updatePhysics(float dt) {
