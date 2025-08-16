@@ -3,8 +3,6 @@ package com.ferralith.engine.renderer;
 import com.ferralith.engine.Transform;
 import com.ferralith.engine.Window;
 import com.ferralith.engine.components.SpriteRenderer;
-import com.ferralith.engine.utils.AssetPool;
-import com.ferralith.engine.utils.Time;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -13,14 +11,10 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_DEBUG_CONTEXT;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_ERROR;
-import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 
 public class RenderBatch implements Comparable<RenderBatch>{
     // TODO: some bugs with batch, redo
@@ -193,12 +187,13 @@ public class RenderBatch implements Comparable<RenderBatch>{
 
 
         boolean isRotated = transform.rotation != 0.0f;
-        Matrix4f transformMatrix = new Matrix4f().identity();
-        if (isRotated) {
-            transformMatrix.translate(transform.position.x, transform.position.y, 0);
-            transformMatrix.rotate((float) Math.toRadians(transform.rotation), 0,0,1);
-            transformMatrix.scale(transform.scale.x, transform.scale.y, 1);
-        }
+        Matrix4f transformMatrix = new Matrix4f()
+                .translate(transform.position.x + transform.scale.x / 2f,
+                        transform.position.y + transform.scale.y / 2f,
+                        0)
+                .rotate((float) Math.toRadians(transform.rotation), 0, 0, 1)
+                .translate(-transform.scale.x / 2f, -transform.scale.y / 2f, 0)
+                .scale(transform.scale.x, transform.scale.y, 1);
 
 
 

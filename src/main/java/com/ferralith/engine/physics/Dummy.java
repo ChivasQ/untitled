@@ -4,6 +4,7 @@ import com.ferralith.engine.GameObject;
 import com.ferralith.engine.Transform;
 import com.ferralith.engine.components.SpriteRenderer;
 import com.ferralith.engine.renderer.Texture;
+import com.ferralith.engine.utils.Mth;
 import org.joml.Vector2f;
 import org.lwjgl.system.MemoryStack;
 
@@ -20,6 +21,7 @@ public class Dummy extends GameObject {
     private AABB box;
     private RigidBody rigidBody;
     private Texture texture;
+    private PolygonCollider collider;
 
     public Dummy(String name, Transform transform, int zIndex) {
         super(name, transform, zIndex);
@@ -68,9 +70,26 @@ public class Dummy extends GameObject {
                 this.transform.scale = new Vector2f(width * 8, height * 8);
                 this.texture = new Texture(width, height, 0);
                 this.setBoxSize(new Vector2f(width * 8, height * 8));
+
+                boolean[][] tmp = new boolean[height][width];
+                int comp = channels.get(0);
+                for (int yf = 0; yf < height; yf++) {
+                    for (int xf = 0; xf < width; xf++) {
+                        int index = (yf * width + xf) * comp;
+
+                        byte r = image.get(index);
+                        byte g = image.get(index + 1);
+                        byte b = image.get(index + 2);
+                        byte a = (comp == 4) ? image.get(index + 3) : (byte) 0xFF;
+
+                        tmp[yf][xf] = (a & 0xFF) != 0;
+                    }
+                }
+
+                this.collider = new PolygonCollider(Mth.DouglasPeucker( Mth.marchingSquares(tmp), 1), transform.scale.x / width);
                 texture.bind();
                 texture.update(image);
-
+                addComponent(this.collider);
                 addComponent(new SpriteRenderer(texture));
                 texture.unbind();
 

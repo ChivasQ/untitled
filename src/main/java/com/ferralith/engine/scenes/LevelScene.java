@@ -75,12 +75,13 @@ public class LevelScene extends Scene {
         go = new GameObject("gen");
         go.addComponent(new SpriteRenderer(new Sprite(texture)));
         go.addTag(Tags.doNotSerialize);
+        go.addTag(Tags.nonPickable);
         go.transform.scale = new Vector2f(1024, 1024);
         addGameObject(go);
 
         dummy = new Dummy("test", new Transform(new Vector2f(400, 400)), 100);
-        dummy.removeComponent(RigidBody.class);
         dummy.loadTexture("assets/textures/objects/tree.png");
+        dummy.removeComponent(RigidBody.class);
         addGameObject(dummy);
 
 
@@ -90,8 +91,8 @@ public class LevelScene extends Scene {
         addGameObject(dummy2);
 
 
-        Dummy dummy1 = new Dummy("test1", new Transform(new Vector2f(50, 200)), 100);
-        dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(10,10));
+        Dummy dummy1 = new Dummy("test1", new Transform(new Vector2f(0, 100)), 100);
+        dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(3,15));
         dummy1.setBoxSize(new Vector2f(100,100));
         addGameObject(dummy1);
 
@@ -143,11 +144,11 @@ public class LevelScene extends Scene {
 
 
 
-        List<Vector2f> polygons = Mth.DouglasPeucker( Mth.marchingSquares(tmp), 10);
+        List<Vector2f> polygons = Mth.DouglasPeucker( Mth.marchingSquares(tmp), 6);
 
         //System.out.println(polygons);
         if (!polygons.isEmpty()) {
-            DebugDraw.addPolygonn(polygons, 1.415f);
+            DebugDraw.addPolygonn(polygons, 2f);
         }
 
 
@@ -205,9 +206,6 @@ public class LevelScene extends Scene {
             Window.changeScene(0, camera);
             DebugDraw.clear();
         }
-
-
-        dummy.transform.rotation++;
     }
 
     private void updatePhysics(float dt) {

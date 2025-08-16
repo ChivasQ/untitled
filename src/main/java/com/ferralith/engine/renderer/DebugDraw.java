@@ -182,10 +182,23 @@ public class DebugDraw {
         for (int i = 0; i < vertices.size(); i++) {
             if (i > 0) {
                 //System.out.println(points[i - 1].toString());
-                addLine2D(vertices.get(i - 1).mul(scale), vertices.get(i).mul(scale), new Vector3f(0,1,0), 1);
+                addLine2D(new Vector2f(vertices.get(i - 1)).mul(scale), new Vector2f(vertices.get(i)).mul(scale), new Vector3f(0,1,0), 1);
             }
         }
-        addLine2D(vertices.get(0).mul(scale), vertices.get(vertices.size() - 1).mul(scale), new Vector3f(0,1,0),1);
+        addLine2D(new Vector2f(vertices.get(0)).mul(scale), new Vector2f(vertices.get(vertices.size() - 1)).mul(scale), new Vector3f(0,1,0),1);
+    }
+
+    public static void addPolygonn(List<Vector2f> vertices, float scale, Vector2f translate) {
+        if (vertices == null) return;
+        if (vertices.isEmpty()) return;
+
+        for (int i = 0; i < vertices.size(); i++) {
+            if (i > 0) {
+                //System.out.println(points[i - 1].toString());
+                addLine2D(new Vector2f(vertices.get(i - 1)).mul(scale).add(translate), new Vector2f(vertices.get(i)).mul(scale).add(translate), new Vector3f(0,1,0), 1);
+            }
+        }
+        addLine2D(new Vector2f(vertices.get(0)).mul(scale).add(translate), new Vector2f(vertices.get(vertices.size() - 1)).mul(scale).add(translate), new Vector3f(0,1,0),1);
     }
 
     public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime) {
