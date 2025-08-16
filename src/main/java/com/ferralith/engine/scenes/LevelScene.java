@@ -8,6 +8,7 @@ import com.ferralith.engine.inputs.KeyListener;
 import com.ferralith.engine.inputs.MouseListener;
 import com.ferralith.engine.physics.AABB;
 import com.ferralith.engine.physics.Dummy;
+import com.ferralith.engine.physics.PolygonCollider;
 import com.ferralith.engine.physics.RigidBody;
 import com.ferralith.engine.renderer.DebugDraw;
 import com.ferralith.engine.renderer.Texture;
@@ -93,6 +94,7 @@ public class LevelScene extends Scene {
 
         Dummy dummy1 = new Dummy("test1", new Transform(new Vector2f(0, 100)), 100);
         dummy1.getComponent(RigidBody.class).applyForce(new Vector2f(3,15));
+        dummy1.removeComponent(RigidBody.class);
         dummy1.setBoxSize(new Vector2f(100,100));
         addGameObject(dummy1);
 
@@ -206,6 +208,9 @@ public class LevelScene extends Scene {
             Window.changeScene(0, camera);
             DebugDraw.clear();
         }
+
+        dummy.transform.rotation++;
+        dummy.getComponent(AABB.class).computeAABB(dummy.getComponent(PolygonCollider.class).getPolygon());
     }
 
     private void updatePhysics(float dt) {

@@ -1,9 +1,12 @@
 package com.ferralith.engine.physics;
 
 import com.ferralith.engine.Component;
+import com.ferralith.engine.Transform;
 import com.ferralith.engine.renderer.DebugDraw;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
+import java.util.List;
 
 public class AABB extends Component {
     private Vector2f center;
@@ -29,7 +32,40 @@ public class AABB extends Component {
     @Override
     public void update(float dt) {
         DebugDraw.addBox2D(center, size, 0, new Vector3f(r,g,b), 1);
+
     }
+
+    public void computeAABB(List<Vector2f> localVertices) {
+        Transform transform = gameObject.transform;
+
+        float cos = (float) Math.cos(Math.toRadians(transform.rotation));
+        float sin = (float) Math.sin(Math.toRadians(transform.rotation));
+
+        float minX = Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE;
+        float maxX = Float.MIN_VALUE;
+        float maxY = Float.MIN_VALUE;
+
+        for (Vector2f v : localVertices) {
+
+            float x = v.x * transform.scale.x / 29;
+            float y = v.y * transform.scale.y / 63;
+
+            float rotatedX = x * cos - y * sin;
+            float rotatedY = x * sin + y * cos;
+
+            rotatedX += transform.position.x;
+            rotatedY += transform.position.y;
+
+            if (rotatedX < minX) minX = rotatedX;
+            if (rotatedX > maxX) maxX = rotatedX;
+            if (rotatedY < minY) minY = rotatedY;
+            if (rotatedY > maxY) maxY = rotatedY;
+        }
+
+        setSize(new Vector2f(maxX-minX, maxY-minY));
+    }
+
 
     public Vector2f getCenter() {
         return center;

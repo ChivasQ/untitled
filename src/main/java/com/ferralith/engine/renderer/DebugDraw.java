@@ -201,6 +201,27 @@ public class DebugDraw {
         addLine2D(new Vector2f(vertices.get(0)).mul(scale).add(translate), new Vector2f(vertices.get(vertices.size() - 1)).mul(scale).add(translate), new Vector3f(0,1,0),1);
     }
 
+
+    public static void addPolygonn(List<Vector2f> vertices, float scale, Vector2f translate, float rotation, Vector2f pos) {
+        if (vertices == null) return;
+        if (vertices.isEmpty()) return;
+        List<Vector2f> vertices1 = new ArrayList<>();
+        for (Vector2f v : vertices) {
+            vertices1.add(new Vector2f(v));
+        }
+        for (int i = 0; i < vertices1.size(); i++) {
+            Mth.rotate(vertices1.get(i), pos, rotation);
+        }
+
+        for (int i = 0; i < vertices1.size(); i++) {
+            if (i > 0) {
+                //System.out.println(points[i - 1].toString());
+                addLine2D(new Vector2f(vertices1.get(i - 1)).mul(scale).add(translate), new Vector2f(vertices1.get(i)).mul(scale).add(translate), new Vector3f(0,1,0), 1);
+            }
+        }
+        addLine2D(new Vector2f(vertices1.get(0)).mul(scale).add(translate), new Vector2f(vertices1.get(vertices.size() - 1)).mul(scale).add(translate), new Vector3f(0,1,0),1);
+    }
+
     public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime) {
         addPolygon(center,radius, color, lifetime, 16);
     }
