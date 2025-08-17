@@ -47,6 +47,7 @@ public class LevelScene extends Scene {
     private Random rand;
     private GameObject go;
     private Dummy dummy;
+    private Dummy dummy5;
 
     public LevelScene() {
         System.out.println("LEVEL SCENE");
@@ -80,10 +81,15 @@ public class LevelScene extends Scene {
         go.transform.scale = new Vector2f(1024, 1024);
         addGameObject(go);
 
-        dummy = new Dummy("test", new Transform(new Vector2f(400, 400)), 100);
+        dummy = new Dummy("test", new Transform(new Vector2f(800, 400)), 100);
         dummy.loadTexture("assets/textures/objects/tree.png");
         dummy.removeComponent(RigidBody.class);
         addGameObject(dummy);
+
+        dummy5 = new Dummy("test", new Transform(new Vector2f(800, 400)), 100);
+        dummy5.loadTexture("assets/textures/objects/tree.png");
+        dummy5.removeComponent(RigidBody.class);
+        addGameObject(dummy5);
 
 
         Dummy dummy2 = new Dummy("test", new Transform(new Vector2f(300, 100)), 100);
@@ -209,8 +215,12 @@ public class LevelScene extends Scene {
             DebugDraw.clear();
         }
 
-        dummy.transform.rotation++;
-        dummy.getComponent(AABB.class).computeAABB(dummy.getComponent(PolygonCollider.class).getPolygon());
+        //dummy.transform.rotation++;
+        //dummy.getComponent(AABB.class).computeAABB(dummy.getComponent(PolygonCollider.class).getPolygon());
+
+        System.out.println(separatingAxisTheorem(
+                dummy.getComponent(PolygonCollider.class).getWorldVertices(),
+                dummy5.getComponent(PolygonCollider.class).getWorldVertices()));
     }
 
     private void updatePhysics(float dt) {
@@ -248,10 +258,60 @@ public class LevelScene extends Scene {
                     //do something
                     aabb1.setColor(1,0,0);
                     aabb2.setColor(1,0,0);
-                    resolveCollision(object1, object2);
+                    //resolveCollision(object1, object2);
                 }
             }
         }
+    }
+
+    public boolean separatingAxisTheorem(List<Vector2f> polyA, List<Vector2f> polyB) {
+        float minOverlap = Float.POSITIVE_INFINITY;
+        Vector2f smallestAxis = new Vector2f();
+
+        List<List<Vector2f>> polygons = List.of(polyA, polyB);
+
+        for (List<Vector2f> poly : polygons) {
+            for (int i = 0; i < poly.size(); i++) {
+                Vector2f p1 = poly.get(i);
+                Vector2f p2 = poly.get((i + 1) % poly.size());
+
+                Vector2f edge = new Vector2f(p2).sub(p1);
+
+                Vector2f axis = new Vector2f(-edge.y, edge.x).normalize();
+
+                float[] projA = project(polyA, axis);
+                float[] projB = project(polyB, axis);
+
+                if (projA[1] < projB[0] || projB[1] < projA[0]) {
+                    return false;
+                }
+
+                float overlap = Math.min(projA[1], projB[1]) - Math.max(projA[0], projB[0]);
+                if (overlap < minOverlap) {
+                    minOverlap = overlap;
+                    smallestAxis.set(axis);
+                }
+            }
+        }
+
+        // если дошли сюда → коллизия
+        // MTV = smallestAxis * minOverlap
+        return true;
+    }
+
+    private float[] project(List<Vector2f> poly, Vector2f axis) {
+        float min = Float.POSITIVE_INFINITY;
+        float max = Float.NEGATIVE_INFINITY;
+        for (Vector2f v : poly) {
+            float proj = dot(v, axis);
+            if (proj < min) min = proj;
+            if (proj > max) max = proj;
+        }
+        return new float[]{min, max};
+    }
+
+    public float dot(Vector2f vec1, Vector2f vec2) {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
     }
 
     private void resolveCollision(GameObject a, GameObject b) {

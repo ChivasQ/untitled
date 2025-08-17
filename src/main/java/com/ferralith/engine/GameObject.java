@@ -1,5 +1,6 @@
 package com.ferralith.engine;
 
+import com.ferralith.engine.factory.GameObjectBuilder;
 import imgui.ImGui;
 
 import java.util.ArrayList;
@@ -121,5 +122,9 @@ public class GameObject {
 
     public List<Component> getAllComponents() {
         return this.components;
+    }
+
+    public static GameObjectBuilder builder(String name) {
+        return new GameObjectBuilder(name);
     }
 }
